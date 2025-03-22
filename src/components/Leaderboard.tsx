@@ -43,7 +43,7 @@ export default function Leaderboard({ challengeId }: LeaderboardProps) {
                       {entry.email}
                     </p>
                     <p className="text-sm text-muted-foreground">
-                      {entry.completed_count}/{entry.challenges.duration} days completed
+                      {entry.completed_count}/{entry.total_days} days completed
                     </p>
                   </div>
                 </div>

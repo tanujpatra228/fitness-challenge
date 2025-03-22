@@ -18,11 +18,6 @@ export interface LeaderboardEntry {
   last_completed: string | null;
 }
 
-export interface LeaderboardEntryWithChallengeDetails extends LeaderboardEntry {
-  challenges: {
-    duration: number;
-  };
-}
 
 export async function logProgress(challengeId: number, userId: string, completed: boolean, notes?: string) {
   const { data, error } = await supabase
@@ -78,7 +73,7 @@ export async function getTodayProgress(challengeId: number, userId: string) {
   return data as ProgressEntry | null;
 }
 
-export async function getLeaderboard(challengeId: number): Promise<LeaderboardEntryWithChallengeDetails[]> {
+export async function getLeaderboard(challengeId: number): Promise<LeaderboardEntry[]> {
   const { data, error } = await supabase
     .from('progress')
     .select(`
@@ -96,7 +91,7 @@ export async function getLeaderboard(challengeId: number): Promise<LeaderboardEn
   }
 
   // Process the data to calculate statistics
-  const userStats = new Map<string, LeaderboardEntryWithChallengeDetails>();
+  const userStats = new Map<string, LeaderboardEntry>();
 
   data.forEach((entry: any) => {
     const userId = entry.user_id;
@@ -107,17 +102,13 @@ export async function getLeaderboard(challengeId: number): Promise<LeaderboardEn
         user_id: userId,
         email,
         completed_count: 0,
-        total_days: 0,
+        total_days: entry.challenges.duration || 0,
         streak: 0,
         last_completed: null,
-        challenges: {
-          duration: entry.challenges.duration
-        }
       });
     }
 
     const stats = userStats.get(userId)!;
-    stats.total_days++;
 
     if (entry.completed) {
       stats.completed_count++;
