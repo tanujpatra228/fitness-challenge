@@ -3,6 +3,8 @@ import { supabase } from "../utils/supabase";
 export interface Profile {
   id: string;
   display_name: string;
+  gender: 'male' | 'female';
+  avatar_id: string;
   created_at: string;
   updated_at: string;
 }
@@ -22,12 +24,19 @@ export async function getProfile(userId: string): Promise<Profile | null> {
   return data;
 }
 
-export async function updateProfile(userId: string, displayName: string): Promise<Profile | null> {
+export async function updateProfile(
+  userId: string,
+  displayName: string,
+  gender: 'male' | 'female',
+  avatarId: string
+): Promise<Profile | null> {
   const { data, error } = await supabase
     .from('profiles')
     .upsert({
       id: userId,
       display_name: displayName,
+      gender,
+      avatar_id: avatarId,
       updated_at: new Date().toISOString()
     })
     .select()

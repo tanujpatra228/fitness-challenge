@@ -3,7 +3,7 @@ import { supabase } from "@/src/utils/supabase";
 import { Session } from "@supabase/supabase-js";
 import { useQuery } from "@tanstack/react-query";
 import React, { createContext, useContext, useEffect, useState } from "react";
-import DisplayNameModal from "./DisplayNameModal";
+import ProfileDetailsModal from "./ProfileDetailsModal";
 
 interface AuthContextType {
     session: Session | null;
@@ -15,7 +15,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [session, setSession] = useState<any>(null);
-    const [showDisplayNameModal, setShowDisplayNameModal] = useState(false);
+    const [showProfileModal, setShowProfileModal] = useState(false);
 
     const authQuery = useQuery({
         queryKey: ['session'],
@@ -39,7 +39,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             if (session?.user) {
                 const profile = await getProfile(session.user.id);
                 if (!profile) {
-                    setShowDisplayNameModal(true);
+                    setShowProfileModal(true);
                 }
             }
         });
@@ -53,9 +53,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         <AuthContext.Provider value={{ session, isSignedIn: !!session, isLoading: authQuery.isLoading }}>
             {children}
             {session?.user && (
-                <DisplayNameModal
-                    isOpen={showDisplayNameModal}
-                    onClose={() => setShowDisplayNameModal(false)}
+                <ProfileDetailsModal
+                    isOpen={showProfileModal}
+                    onClose={() => setShowProfileModal(false)}
                     userId={session.user.id}
                 />
             )}
