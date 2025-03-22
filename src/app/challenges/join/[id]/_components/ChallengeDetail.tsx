@@ -7,6 +7,8 @@ import { joinChallenge, leaveChallenge } from "@/src/services/challenges.service
 import { useMutation } from "@tanstack/react-query"
 import { revalidatePath } from "next/cache"
 import Link from "next/link"
+import ProgressLogger from "@/src/components/ProgressLogger"
+import ProgressHistory from "@/src/components/ProgressHistory"
 
 export default function ChallengeDetail({ challenge }: { challenge: any }) {
     const auth = useAuth();
@@ -29,38 +31,55 @@ export default function ChallengeDetail({ challenge }: { challenge: any }) {
     });
 
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen py-2">
-            <Card className="w-[450px]">
-                <CardHeader>
-                    <CardTitle>{challenge.title}</CardTitle>
-                    <CardDescription>{challenge.duration} days</CardDescription>
-                </CardHeader>
-                <CardContent>
-                    <p className="mb-4">{challenge.description}</p>
-                    {!!auth.session ? (
-                        alreadyJoined ? (
-                            <Button
-                                onClick={() => leaveChallengeMutation.mutate(challenge.id)}
-                                className="mt-4"
-                                variant="destructive"
-                                disabled={leaveChallengeMutation.isPending}
-                            >
-                                Leave Challenge
-                            </Button>
-                        ) : (
-                            <Button
-                                onClick={() => joinChallengeMutation.mutate(challenge.id)}
-                                className="mt-4"
-                                disabled={alreadyJoined || joinChallengeMutation.isPending}
-                            >
-                                Join Challenge
-                            </Button>
-                        )
-                    ) : (
-                        <Link href="/">Login to Join Challenges</Link>
+        <div className="container mx-auto py-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                {/* Left Column */}
+                <div className="space-y-8">
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>{challenge.title}</CardTitle>
+                            <CardDescription>{challenge.duration} days</CardDescription>
+                        </CardHeader>
+                        <CardContent>
+                            <p className="mb-4">{challenge.description}</p>
+                            {!!auth.session ? (
+                                alreadyJoined ? (
+                                    <Button
+                                        onClick={() => leaveChallengeMutation.mutate(challenge.id)}
+                                        className="mt-4"
+                                        variant="destructive"
+                                        disabled={leaveChallengeMutation.isPending}
+                                    >
+                                        Leave Challenge
+                                    </Button>
+                                ) : (
+                                    <Button
+                                        onClick={() => joinChallengeMutation.mutate(challenge.id)}
+                                        className="mt-4"
+                                        disabled={alreadyJoined || joinChallengeMutation.isPending}
+                                    >
+                                        Join Challenge
+                                    </Button>
+                                )
+                            ) : (
+                                <Link href="/">Login to Join Challenges</Link>
+                            )}
+                        </CardContent>
+                    </Card>
+
+                    {alreadyJoined && (
+                        <>
+                            <ProgressLogger challengeId={challenge.id} />
+                            <ProgressHistory challengeId={challenge.id} />
+                        </>
                     )}
-                </CardContent>
-            </Card>
+                </div>
+
+                {/* Right Column - Empty for now */}
+                <div className="hidden md:block">
+                    {/* Future content will go here */}
+                </div>
+            </div>
         </div>
     )
 }

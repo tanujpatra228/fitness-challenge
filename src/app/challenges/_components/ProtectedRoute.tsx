@@ -9,7 +9,6 @@ export const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ childr
   const router = useRouter();
 
   useEffect(() => {
-    console.log('user && isLoading', user, isLoading);
     if (!user && !isLoading) {
       router.push('/');
     }
