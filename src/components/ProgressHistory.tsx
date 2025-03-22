@@ -42,8 +42,8 @@ export default function ProgressHistory({ challengeId }: ProgressHistoryProps) {
                 className="flex items-center justify-between p-3 rounded-lg border"
               >
                 <div>
-                  <p className="font-medium">
-                    {index + 1}. {format(new Date(entry.date), 'MMM dd, yyyy')}
+                  <p className="font-medium flex items-center gap-2">
+                    <span className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center font-semibold">{index + 1}</span> {format(new Date(entry.date), 'MMM dd, yyyy')}
                   </p>
                   {entry.notes && (
                     <p className="text-sm text-muted-foreground">{entry.notes}</p>
