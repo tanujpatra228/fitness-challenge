@@ -9,6 +9,7 @@ import { revalidatePath } from "next/cache"
 import Link from "next/link"
 import ProgressLogger from "@/src/components/ProgressLogger"
 import ProgressHistory from "@/src/components/ProgressHistory"
+import Leaderboard from "@/src/components/Leaderboard"
 
 export default function ChallengeDetail({ challenge }: { challenge: any }) {
     const auth = useAuth();
@@ -75,9 +76,9 @@ export default function ChallengeDetail({ challenge }: { challenge: any }) {
                     )}
                 </div>
 
-                {/* Right Column - Empty for now */}
-                <div className="hidden md:block">
-                    {/* Future content will go here */}
+                {/* Right Column - Leaderboard */}
+                <div className="">
+                    <Leaderboard challengeId={challenge.id} />
                 </div>
             </div>
         </div>
