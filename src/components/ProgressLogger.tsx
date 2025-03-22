@@ -35,6 +35,7 @@ export default function ProgressLogger({ challengeId }: ProgressLoggerProps) {
       setNotes("");
       todayProgressQuery.refetch();
       queryClient.invalidateQueries({ queryKey: ['progress', challengeId, 'history'] });
+      queryClient.invalidateQueries({ queryKey: ['leaderboard', challengeId] });
     },
     onError: () => {
       toast.error("Failed to log progress");

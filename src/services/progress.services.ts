@@ -80,6 +80,7 @@ export async function getLeaderboard(challengeId: number): Promise<LeaderboardEn
       user_id,
       completed,
       date,
+      profiles:user_id (display_name),
       challenges:challenge_id (duration)
     `)
     .eq('challenge_id', challengeId)
@@ -93,9 +94,11 @@ export async function getLeaderboard(challengeId: number): Promise<LeaderboardEn
   // Process the data to calculate statistics
   const userStats = new Map<string, LeaderboardEntry>();
 
+  console.log('data', data);
+
   data.forEach((entry: any) => {
     const userId = entry.user_id;
-    const email = entry.profiles?.email || 'Anonymous';
+    const email = entry.profiles?.display_name || 'Anonymous';
     
     if (!userStats.has(userId)) {
       userStats.set(userId, {

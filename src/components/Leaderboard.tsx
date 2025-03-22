@@ -1,9 +1,8 @@
 "use client"
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/src/components/ui/card"
-import { getLeaderboard, type LeaderboardEntry } from "@/src/services/progress.services"
+import { getLeaderboard } from "@/src/services/progress.services"
 import { useQuery } from "@tanstack/react-query"
-import { format } from "date-fns"
 
 interface LeaderboardProps {
   challengeId: number;
@@ -14,6 +13,7 @@ export default function Leaderboard({ challengeId }: LeaderboardProps) {
     queryKey: ['leaderboard', challengeId],
     queryFn: () => getLeaderboard(challengeId),
     enabled: !!challengeId,
+    refetchInterval: 10000
   });
 
   const leaderboard = leaderboardQuery.data || [];
