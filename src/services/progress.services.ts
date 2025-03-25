@@ -43,20 +43,99 @@ export async function logProgress(challengeId: number, userId: string, completed
   return data;
 }
 
-export async function getProgress(challengeId: number, userId: string) {
+async function insertMissedEntries(challengeId: number, userId: string, dates: string[]) {
+  if (dates.length === 0) return [];
+
+  const entries = dates.map(date => ({
+    challenge_id: challengeId,
+    user_id: userId,
+    date,
+    completed: false,
+    notes: 'missed'
+  }));
+
   const { data, error } = await supabase
     .from("progress")
-    .select("*")
-    .eq("challenge_id", challengeId)
-    .eq("user_id", userId)
-    .order("date", { ascending: false });
+    .insert(entries)
+    .select();
 
   if (error) {
-    console.log("Error fetching progress:", error);
+    console.log("Error inserting missed entries:", error);
     return [];
   }
 
   return data as ProgressEntry[];
+}
+
+export async function getProgress(challengeId: number, userId: string, joinedDate: string, challengeDuration: number) {
+  // Get all progress entries
+  const { data: progressEntries, error: progressError } = await supabase
+    .from("progress")
+    .select("*")
+    .eq("challenge_id", challengeId)
+    .eq("user_id", userId)
+    .order("date", { ascending: true });
+
+  if (progressError) {
+    console.log("Error fetching progress:", progressError);
+    return [];
+  }
+
+  // Create a map of existing progress entries by date
+  const progressMap = new Map(
+    progressEntries.map((entry: ProgressEntry) => [entry.date, entry])
+  );
+
+  // Generate all dates between start_date and start_date + duration
+  const startDate = new Date(joinedDate);
+  const allDates: ProgressEntry[] = [];
+  // find how many days have passed till date from joinedDate but dont count today
+  const daysPassed = Math.ceil((new Date().getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+
+  // Collect all missing dates
+  const missingDates: string[] = [];
+
+  for (let i = 0; i < Math.min(daysPassed, challengeDuration); i++) {
+    const currentDate = new Date(startDate);
+    currentDate.setDate(startDate.getDate() + i);
+    const dateString = currentDate.toISOString().split('T')[0];
+
+    // If there's an existing entry for this date, use it
+    if (progressMap.has(dateString)) {
+      allDates.push(progressMap.get(dateString)!);
+    } else {
+      // Add to missing dates array
+      missingDates.push(dateString);
+      // Create a temporary entry for display
+      allDates.push({
+        id: -i, // Temporary negative ID
+        challenge_id: challengeId,
+        user_id: userId,
+        date: dateString,
+        completed: false,
+        notes: 'missed'
+      });
+    }
+  }
+
+  // If there are missing dates, insert them all at once
+  if (missingDates.length > 0) {
+    const insertedEntries = await insertMissedEntries(challengeId, userId, missingDates);
+    
+    // Update the allDates array with the real IDs from inserted entries
+    let insertIndex = 0;
+    allDates.forEach((entry, index) => {
+      if (entry.id < 0) {
+        const insertedEntry = insertedEntries[insertIndex];
+        if (insertedEntry) {
+          allDates[index] = insertedEntry;
+        }
+        insertIndex++;
+      }
+    });
+  }
+
+  return allDates;
 }
 
 export async function getTodayProgress(challengeId: number, userId: string) {

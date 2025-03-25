@@ -59,14 +59,14 @@ export default function ProgressLogger({ challengeId }: ProgressLoggerProps) {
   const todayProgress = todayProgressQuery.data as ProgressEntry | null;
 
   return (
-    <Card className="w-full max-w-md mx-auto">
+    <Card className="w-full">
       <CardHeader>
-        <CardTitle>Log Today's Progress</CardTitle>
-        <CardDescription>
+        <CardTitle className="text-lg font-bold text-left">Log Today's Progress</CardTitle>
+        <CardDescription className="text-left">
           {todayProgress ? "You've already logged your progress for today" : "Mark your progress for today"}
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className={`space-y-4 ${todayProgress ? 'hidden' : ''}`}>
         {!todayProgress && (
           <>
             <Textarea
