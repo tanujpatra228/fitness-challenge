@@ -1,8 +1,9 @@
 "use client"
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/src/components/ui/card"
-import { getLeaderboard } from "@/src/services/progress.services"
-import { useQuery } from "@tanstack/react-query"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/src/components/ui/card";
+import { getLeaderboard } from "@/src/services/progress.services";
+import { useQuery } from "@tanstack/react-query";
+import LeaderboardAvatar from "./ui/leader-board-avatar";
 
 interface LeaderboardProps {
   challengeId: number;
@@ -35,12 +36,11 @@ export default function Leaderboard({ challengeId }: LeaderboardProps) {
                 className="flex items-center justify-between p-3 rounded-lg border"
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center font-semibold">
-                    {index + 1}
-                  </div>
+                  <LeaderboardAvatar entry={entry} index={index} />
+
                   <div>
                     <p className="font-medium truncate max-w-[150px]">
-                      {entry.email}
+                      {entry.profile.display_name}
                     </p>
                     <p className="text-sm text-muted-foreground">
                       {entry.completed_count}/{entry.total_days} days completed

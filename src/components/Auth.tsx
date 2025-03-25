@@ -7,6 +7,7 @@ import { supabase } from "@/src/utils/supabase"
 import { Button } from "@/src/components/ui/button"
 import { Input } from "@/src/components/ui/input"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/src/components/ui/card"
+import { toast } from "sonner"
 
 export default function Auth() {
   const [loading, setLoading] = useState(false)
@@ -17,9 +18,9 @@ export default function Auth() {
     setLoading(true)
     const { error } = await supabase.auth.signInWithOtp({ email })
     if (error) {
-      alert(error.message)
+      toast.error(error.message)
     } else {
-      alert("Check your email for the login link!")
+      toast.success("Check your email for the login link!")
     }
     setLoading(false)
   }

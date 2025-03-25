@@ -11,11 +11,15 @@ export interface ProgressEntry {
 
 export interface LeaderboardEntry {
   user_id: string;
-  email: string;
   completed_count: number;
   total_days: number;
   streak: number;
   last_completed: string | null;
+  profile: {
+    display_name: string;
+    gender: string;
+    avatar_id: string;
+  };
 }
 
 
@@ -80,7 +84,7 @@ export async function getLeaderboard(challengeId: number): Promise<LeaderboardEn
       user_id,
       completed,
       date,
-      profiles:user_id (display_name),
+      profiles:user_id (display_name, gender, avatar_id),
       challenges:challenge_id (duration)
     `)
     .eq('challenge_id', challengeId)
@@ -94,20 +98,17 @@ export async function getLeaderboard(challengeId: number): Promise<LeaderboardEn
   // Process the data to calculate statistics
   const userStats = new Map<string, LeaderboardEntry>();
 
-  console.log('data', data);
-
   data.forEach((entry: any) => {
     const userId = entry.user_id;
-    const email = entry.profiles?.display_name || 'Anonymous';
     
     if (!userStats.has(userId)) {
       userStats.set(userId, {
         user_id: userId,
-        email,
         completed_count: 0,
         total_days: entry.challenges.duration || 0,
         streak: 0,
         last_completed: null,
+        profile: entry.profiles
       });
     }
 

@@ -15,6 +15,7 @@ export default function ChallengeDetail({ challenge }: { challenge: any }) {
     const auth = useAuth();
 
     const alreadyJoined = challenge?.participants?.some((participant: any) => participant.user_id === auth?.session?.user?.id);
+    const joinedDate = challenge?.participants?.find((participant: any) => participant.user_id === auth?.session?.user?.id)?.joined_at || null;
 
     const joinChallengeMutation = useMutation({
         mutationFn: async (challengeId: number) => {
@@ -71,7 +72,11 @@ export default function ChallengeDetail({ challenge }: { challenge: any }) {
                     {alreadyJoined && (
                         <>
                             <ProgressLogger challengeId={challenge.id} />
-                            <ProgressHistory challengeId={challenge.id} />
+                            <ProgressHistory
+                                challengeId={challenge.id}
+                                joinedDate={joinedDate}
+                                challengeDuration={challenge.duration}
+                            />
                         </>
                     )}
                 </div>
