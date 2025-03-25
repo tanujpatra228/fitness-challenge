@@ -10,6 +10,9 @@ import Link from "next/link"
 import ProgressLogger from "@/src/components/ProgressLogger"
 import ProgressHistory from "@/src/components/ProgressHistory"
 import Leaderboard from "@/src/components/Leaderboard"
+import { Share2 } from "lucide-react"
+import { shareChallengeLink } from "@/src/lib/utils"
+import { toast } from "sonner"
 
 export default function ChallengeDetail({ challenge }: { challenge: any }) {
     const auth = useAuth();
@@ -46,14 +49,28 @@ export default function ChallengeDetail({ challenge }: { challenge: any }) {
                             <p className="mb-4">{challenge.description}</p>
                             {!!auth.session ? (
                                 alreadyJoined ? (
-                                    <Button
-                                        onClick={() => leaveChallengeMutation.mutate(challenge.id)}
-                                        className="mt-4"
-                                        variant="destructive"
-                                        disabled={leaveChallengeMutation.isPending}
-                                    >
-                                        Leave Challenge
-                                    </Button>
+                                    <div className="flex justify-center items-center gap-2">
+                                        <Button
+                                            onClick={() => leaveChallengeMutation.mutate(challenge.id)}
+                                            className="mt-4"
+                                            variant="destructive"
+                                            disabled={leaveChallengeMutation.isPending}
+                                        >
+                                            Quit Challenge
+                                        </Button>
+                                        <Button
+                                            onClick={async () => {
+                                                try {
+                                                    await shareChallengeLink(challenge.id, toast.success);
+                                                } catch (error) {
+                                                    toast.error("Failed to share link");
+                                                }
+                                            }}
+                                            className="mt-4 inline-flex items-center justify-center gap-2 whitespace-nowrap"
+                                            >
+                                            Challenge Friend <Share2 />
+                                        </Button>
+                                    </div>
                                 ) : (
                                     <Button
                                         onClick={() => joinChallengeMutation.mutate(challenge.id)}

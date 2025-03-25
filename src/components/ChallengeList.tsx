@@ -3,10 +3,10 @@
 import { Button } from "@/src/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/src/components/ui/card"
 import { useMutation, useQuery } from "@tanstack/react-query"
-import { SquareArrowOutUpRight } from "lucide-react"
+import { Share2, SquareArrowOutUpRight } from "lucide-react"
 import Link from "next/link"
 import { toast } from "sonner"
-import { copyInviteLink } from "../lib/utils"
+import { shareChallengeLink } from "../lib/utils"
 import { fetchChallenges, joinChallenge, leaveChallenge } from "../services/challenges.services"
 import { useAuth } from "./AuthProvider"
 
@@ -70,7 +70,7 @@ export default function ChallengeList() {
                       variant="destructive"
                       disabled={leaveChallengeMutation.isPending}
                     >
-                      Leave Challenge
+                      Quit Challenge
                     </Button>
                     ) : (
                       <Button
@@ -83,9 +83,16 @@ export default function ChallengeList() {
                     )
                   ) : (
                     <Button
-                      onClick={() => copyInviteLink(challenge.id, () => toast("Copied to Clipboard"))} className="mt-4"
+                      onClick={async () => {
+                        try {
+                          await shareChallengeLink(challenge.id, toast.success);
+                        } catch (error) {
+                          toast.error("Failed to share link");
+                        }
+                      }}
+                      className="mt-4 inline-flex items-center justify-center gap-2 whitespace-nowrap"
                     >
-                      Copy Invite Link
+                      Challenge Friend <Share2 />
                     </Button>
                   )
                 }
