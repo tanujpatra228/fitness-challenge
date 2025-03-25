@@ -135,6 +135,8 @@ export async function getProgress(challengeId: number, userId: string, joinedDat
     });
   }
 
+  // sort by date ascending
+  allDates.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
   return allDates;
 }
 

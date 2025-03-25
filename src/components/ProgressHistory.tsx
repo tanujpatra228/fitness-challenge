@@ -28,11 +28,13 @@ export default function ProgressHistory({ challengeId, joinedDate, challengeDura
 
   const progress = progressQuery.data as ProgressEntry[] || [];
 
+  if (progress.length === 0) return null;
+
   return (
     <Card className="w-full">
       <CardHeader>
-        <CardTitle>Progress History</CardTitle>
-        <CardDescription>Your daily progress for this challenge</CardDescription>
+        <CardTitle className="text-lg text-left">Progress History</CardTitle>
+        <CardDescription className="text-left">Your daily progress for this challenge</CardDescription>
       </CardHeader>
       <CardContent>
         {progress.length === 0 ? (
@@ -48,17 +50,17 @@ export default function ProgressHistory({ challengeId, joinedDate, challengeDura
               >
                 <div className="flex items-center gap-2">
                   <span className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center font-semibold">
-                    {index + 1}
+                    {progress.length - index}
                   </span>
                   <div>
                     <p className="font-medium">
                       {format(new Date(entry.date), 'MMM dd, yyyy')}
                     </p>
                     {entry.notes && (
-                      <p className={`text-sm ${
+                      <p className={`text-sm text-muted-foreground ${
                         entry.notes === 'missed' 
-                          ? 'text-muted-foreground flex items-center gap-1'
-                          : 'text-muted-foreground'
+                          ? 'flex items-center gap-1'
+                          : ''
                       }`}>
                         {entry.notes === 'missed' && <CalendarX className="w-3 h-3" />}
                         {entry.notes}
@@ -69,11 +71,9 @@ export default function ProgressHistory({ challengeId, joinedDate, challengeDura
                 <div className={`px-3 py-1 rounded-full text-sm ${
                   entry.completed
                     ? 'bg-green-100 text-green-800'
-                    : entry.notes === 'missed'
-                    ? 'bg-yellow-100 text-yellow-800'
                     : 'bg-red-100 text-red-800'
                 }`}>
-                  {entry.completed ? 'Completed' : entry.notes === 'missed' ? 'Missed' : 'Failed'}
+                  {entry.completed ? 'Completed' : 'Failed'}
                 </div>
               </div>
             ))}
