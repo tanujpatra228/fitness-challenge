@@ -7,40 +7,54 @@ export interface ProgressEntry {
   date: string;
   completed: boolean;
   notes?: string;
+  created_at?: string;
 }
 
 export interface LeaderboardEntry {
   user_id: string;
+  profile: {
+    display_name: string;
+    avatar_id: string;
+    gender: string;
+  };
   completed_count: number;
   total_days: number;
   streak: number;
-  last_completed: string | null;
-  profile: {
+  last_completed_date: string | null;
+}
+
+interface LeaderboardProgressEntry {
+  user_id: string;
+  completed: boolean;
+  created_at: string;
+  profiles: {
     display_name: string;
-    gender: string;
     avatar_id: string;
+    gender: string;
   };
 }
 
-
 export async function logProgress(challengeId: number, userId: string, completed: boolean, notes?: string) {
   const { data, error } = await supabase
-    .from("progress")
-    .insert([{
-      challenge_id: challengeId,
-      user_id: userId,
-      date: new Date().toISOString().split('T')[0],
-      completed,
-      notes
-    }])
+    .from('progress')
+    .insert([
+      {
+        challenge_id: challengeId,
+        user_id: userId,
+        date: new Date().toISOString().split('T')[0],
+        completed,
+        notes
+      }
+    ])
     .select()
     .single();
 
   if (error) {
+    console.error('Error logging progress:', error);
     throw error;
   }
 
-  return data;
+  return data as unknown as ProgressEntry;
 }
 
 async function insertMissedEntries(challengeId: number, userId: string, dates: string[]) {
@@ -142,20 +156,21 @@ export async function getProgress(challengeId: number, userId: string, joinedDat
 
 export async function getTodayProgress(challengeId: number, userId: string) {
   const today = new Date().toISOString().split('T')[0];
+  
   const { data, error } = await supabase
-    .from("progress")
-    .select("*")
-    .eq("challenge_id", challengeId)
-    .eq("user_id", userId)
-    .eq("date", today)
+    .from('progress')
+    .select('*')
+    .eq('challenge_id', challengeId)
+    .eq('user_id', userId)
+    .eq('date', today)
     .single();
 
-  if (error && error.code !== 'PGRST116') { // PGRST116 is "no rows returned"
-    console.log("Error fetching today's progress:", error);
-    return null;
+  if (error && error.code !== 'PGRST116') {
+    console.error('Error fetching today\'s progress:', error);
+    throw error;
   }
 
-  return data as ProgressEntry | null;
+  return data as unknown as ProgressEntry | null;
 }
 
 export async function getLeaderboard(challengeId: number): Promise<LeaderboardEntry[]> {
@@ -164,70 +179,80 @@ export async function getLeaderboard(challengeId: number): Promise<LeaderboardEn
     .select(`
       user_id,
       completed,
-      date,
-      profiles:user_id (display_name, gender, avatar_id),
-      challenges:challenge_id (duration)
+      created_at,
+      profiles (
+        display_name,
+        avatar_id,
+        gender
+      )
     `)
     .eq('challenge_id', challengeId)
-    .order('date', { ascending: false });
+    .order('created_at', { ascending: true });
 
   if (error) {
-    console.log('Error fetching leaderboard:', error);
+    console.error('Error fetching leaderboard:', error);
+    throw error;
+  }
+
+  if (!data) {
     return [];
   }
 
-  // Process the data to calculate statistics
-  const userStats = new Map<string, LeaderboardEntry>();
-
-  data.forEach((entry: any) => {
-    const userId = entry.user_id;
-    
-    if (!userStats.has(userId)) {
-      userStats.set(userId, {
-        user_id: userId,
+  // Group progress by user
+  const userProgress = (data as unknown as LeaderboardProgressEntry[]).reduce((acc, entry) => {
+    if (!acc[entry.user_id]) {
+      acc[entry.user_id] = {
+        user_id: entry.user_id,
+        profile: entry.profiles,
         completed_count: 0,
-        total_days: entry.challenges.duration || 0,
+        total_days: 0,
         streak: 0,
-        last_completed: null,
-        profile: entry.profiles
-      });
+        last_completed_date: null
+      };
     }
-
-    const stats = userStats.get(userId)!;
-
+    acc[entry.user_id].total_days++;
     if (entry.completed) {
-      stats.completed_count++;
-      if (!stats.last_completed || new Date(entry.date) > new Date(stats.last_completed)) {
-        stats.last_completed = entry.date;
-      }
+      acc[entry.user_id].completed_count++;
+      acc[entry.user_id].last_completed_date = entry.created_at;
     }
+    return acc;
+  }, {} as Record<string, LeaderboardEntry>);
 
-    // Calculate streak
-    if (entry.completed && stats.last_completed) {
-      const lastDate = new Date(stats.last_completed);
-      const currentDate = new Date(entry.date);
-      const diffTime = Math.abs(currentDate.getTime() - lastDate.getTime());
-      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  // Calculate streaks
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  Object.values(userProgress).forEach(entry => {
+    if (entry.last_completed_date) {
+      const lastCompleted = new Date(entry.last_completed_date);
+      lastCompleted.setHours(0, 0, 0, 0);
       
-      if (diffDays === 1) {
-        stats.streak++;
-      } else {
-        stats.streak = 1;
+      const daysSinceLastCompleted = Math.floor((today.getTime() - lastCompleted.getTime()) / (1000 * 60 * 60 * 24));
+      if (daysSinceLastCompleted <= 1) {
+        entry.streak = 1;
+        let currentDate = new Date(lastCompleted);
+        currentDate.setDate(currentDate.getDate() - 1);
+        
+        while ((data as unknown as LeaderboardProgressEntry[]).some(d => 
+          d.user_id === entry.user_id && 
+          new Date(d.created_at).toDateString() === currentDate.toDateString() &&
+          d.completed
+        )) {
+          entry.streak++;
+          currentDate.setDate(currentDate.getDate() - 1);
+        }
       }
-    } else if (entry.completed) {
-      stats.streak = 1;
     }
   });
 
-  return Array.from(userStats.values())
+  // Convert to array and sort by completion rate and streak
+  return Object.values(userProgress)
     .sort((a, b) => {
-      // Sort by completion rate first
       const aRate = a.completed_count / a.total_days;
       const bRate = b.completed_count / b.total_days;
-      if (bRate !== aRate) {
+      if (aRate !== bRate) {
         return bRate - aRate;
       }
-      // Then by streak
       return b.streak - a.streak;
     });
 }

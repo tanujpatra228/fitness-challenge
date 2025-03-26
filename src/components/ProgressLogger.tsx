@@ -8,6 +8,7 @@ import { logProgress, getTodayProgress, type ProgressEntry } from "@/src/service
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 import { useState } from "react"
 import { toast } from "sonner"
+import { Skeleton } from "./ui/skeleton"
 
 interface ProgressLoggerProps {
   challengeId: number;
@@ -16,13 +17,16 @@ interface ProgressLoggerProps {
 export default function ProgressLogger({ challengeId }: ProgressLoggerProps) {
   const { session } = useAuth();
   const [notes, setNotes] = useState("");
-  const [loading, setLoading] = useState(false);
   const queryClient = useQueryClient();
 
   const todayProgressQuery = useQuery({
     queryKey: ['progress', challengeId, 'today'],
     queryFn: () => getTodayProgress(challengeId, session?.user?.id || ''),
     enabled: !!session?.user?.id,
+    staleTime: 5000,
+    gcTime: 30000,
+    retry: 2,
+    retryDelay: 1000,
   });
 
   const logProgressMutation = useMutation({
@@ -33,27 +37,55 @@ export default function ProgressLogger({ challengeId }: ProgressLoggerProps) {
     onSuccess: () => {
       toast.success("Progress logged successfully!");
       setNotes("");
-      todayProgressQuery.refetch();
-      queryClient.invalidateQueries({ queryKey: ['progress', challengeId, 'history'] });
+      // Invalidate all progress-related queries
+      queryClient.invalidateQueries({ queryKey: ['progress', challengeId] });
       queryClient.invalidateQueries({ queryKey: ['leaderboard', challengeId] });
     },
-    onError: () => {
-      toast.error("Failed to log progress");
+    onError: (error) => {
+      console.error("Error logging progress:", error);
+      toast.error("Failed to log progress. Please try again.");
     }
   });
 
   const handleLogProgress = async (completed: boolean) => {
     if (!session?.user?.id) return;
-    setLoading(true);
     try {
       await logProgressMutation.mutateAsync({ completed, notes });
-    } finally {
-      setLoading(false);
+    } catch (error) {
+      // Error is already handled in onError
     }
   };
 
   if (!session?.user?.id) {
     return null;
+  }
+
+  if (todayProgressQuery.isLoading) {
+    return (
+      <Card className="w-full">
+        <CardHeader>
+          <Skeleton className="h-6 w-48" />
+          <Skeleton className="h-4 w-64" />
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <Skeleton className="h-20 w-full" />
+          <div className="flex gap-2">
+            <Skeleton className="h-10 flex-1" />
+          </div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  if (todayProgressQuery.isError) {
+    return (
+      <Card className="w-full">
+        <CardHeader>
+          <CardTitle className="text-lg font-bold text-left">Log Today's Progress</CardTitle>
+          <CardDescription className="text-left">Error loading today's progress. Please try again.</CardDescription>
+        </CardHeader>
+      </Card>
+    );
   }
 
   const todayProgress = todayProgressQuery.data as ProgressEntry | null;
@@ -77,18 +109,18 @@ export default function ProgressLogger({ challengeId }: ProgressLoggerProps) {
             <div className="flex gap-2">
               <Button
                 onClick={() => handleLogProgress(true)}
-                disabled={loading}
+                disabled={logProgressMutation.isPending}
                 className="flex-1"
               >
-                Mark as Completed
+                {logProgressMutation.isPending ? "Logging..." : "Mark as Completed"}
               </Button>
               <Button
                 onClick={() => handleLogProgress(false)}
-                disabled={loading}
+                disabled={logProgressMutation.isPending}
                 variant="destructive"
                 className="flex-1"
               >
-                Mark as Failed
+                {logProgressMutation.isPending ? "Logging..." : "Mark as Failed"}
               </Button>
             </div>
           </>
