@@ -14,27 +14,35 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    const [session, setSession] = useState<any>(null);
+    const [session, setSession] = useState<Session | null>(null);
     const [showProfileModal, setShowProfileModal] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
 
-    const authQuery = useQuery({
-        queryKey: ['session'],
-        queryFn: async () => {
-            const { data: session } = await supabase.auth.getSession();
-            setSession(session);
-            return session;
-        },
-        refetchOnWindowFocus: false,
-    });
-
-    const profileQuery = useQuery({
-        queryKey: ['profile', session?.user?.id],
-        queryFn: () => getProfile(session?.user?.id),
-        enabled: !!session?.user?.id,
-    });
-
+    // Initial session check
     useEffect(() => {
-        const { data: authListener } = supabase.auth.onAuthStateChange(async (_event, session) => {
+        const initializeAuth = async () => {
+            try {
+                const { data: { session } } = await supabase.auth.getSession();
+                setSession(session);
+                if (session?.user) {
+                    const profile = await getProfile(session.user.id);
+                    if (!profile) {
+                        setShowProfileModal(true);
+                    }
+                }
+            } catch (error) {
+                console.error('Error initializing auth:', error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        initializeAuth();
+    }, []);
+
+    // Listen for auth changes
+    useEffect(() => {
+        const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
             setSession(session);
             if (session?.user) {
                 const profile = await getProfile(session.user.id);
@@ -45,12 +53,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         });
 
         return () => {
-            authListener.subscription.unsubscribe();
+            subscription.unsubscribe();
         };
     }, []);
 
     return (
-        <AuthContext.Provider value={{ session, isSignedIn: !!session, isLoading: authQuery.isLoading }}>
+        <AuthContext.Provider value={{ session, isSignedIn: !!session, isLoading }}>
             {children}
             {session?.user && (
                 <ProfileDetailsModal

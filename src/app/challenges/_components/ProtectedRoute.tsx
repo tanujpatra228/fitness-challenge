@@ -5,15 +5,15 @@ import { useEffect } from "react";
 
 export const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { session, isLoading } = useAuth();
-  const { user } = session || {};
   const router = useRouter();
 
   useEffect(() => {
-    if (!user && !isLoading) {
-      router.push('/');
+    if (!isLoading && !session) {
+      router.replace('/');
     }
-  }, [user, isLoading]);
+  }, [session, isLoading, router]);
 
+  // Show loading state while checking authentication
   if (isLoading) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen py-2">
@@ -22,19 +22,14 @@ export const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ childr
           <p>Loading...</p>
         </main>
       </div>
-    )
+    );
   }
 
-  if (!user) {
+  // Don't render anything if not authenticated
+  if (!session) {
     return null;
   }
 
-  return (
-    <div className="flex flex-col items-center justify-center min-h-screen py-2">
-      <main className="flex flex-col items-center justify-center w-full flex-1 px-6 md:px-20 text-center">
-        <h1 className="text-4xl font-bold mb-8">Fitness Challenge Platform</h1>
-        {children}
-      </main>
-    </div>
-  )
-}
+  // Render children if authenticated
+  return <>{children}</>;
+};

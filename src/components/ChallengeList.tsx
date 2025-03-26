@@ -65,21 +65,21 @@ export default function ChallengeList() {
                   user?.id !== challenge.created_by ? (
                     alreadyJoined ? (
                       <Button
-                      onClick={() => leaveChallengeMutation.mutate(challenge.id)}
-                      className="mt-4"
-                      variant="destructive"
-                      disabled={leaveChallengeMutation.isPending}
-                    >
-                      Quit Challenge
-                    </Button>
+                        onClick={() => leaveChallengeMutation.mutate(challenge.id)}
+                        className="mt-4"
+                        variant="destructive"
+                        disabled={leaveChallengeMutation.isPending}
+                      >
+                        Quit Challenge
+                      </Button>
                     ) : (
                       <Button
-                      onClick={() => joinChallengeMutation.mutate(challenge.id)}
-                      className="mt-4"
-                      disabled={alreadyJoined || joinChallengeMutation.isPending}
-                    >
-                      Join Challenge
-                    </Button>
+                        onClick={() => joinChallengeMutation.mutate(challenge.id)}
+                        className="mt-4"
+                        disabled={alreadyJoined || joinChallengeMutation.isPending}
+                      >
+                        Join Challenge
+                      </Button>
                     )
                   ) : (
                     <Button
