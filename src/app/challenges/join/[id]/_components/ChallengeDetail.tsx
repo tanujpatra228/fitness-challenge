@@ -9,7 +9,7 @@ import Link from "next/link"
 import ProgressLogger from "@/src/components/ProgressLogger"
 import ProgressHistory from "@/src/components/ProgressHistory"
 import Leaderboard from "@/src/components/Leaderboard"
-import { Share2 } from "lucide-react"
+import { Calendar1, Share2, Users } from "lucide-react"
 import { shareChallengeLink } from "@/src/lib/utils"
 import { toast } from "sonner"
 import { Skeleton } from "@/src/components/ui/skeleton"
@@ -20,6 +20,7 @@ export default function ChallengeDetail({ challenge }: { challenge: any }) {
 
     const alreadyJoined = challenge?.participants?.some((participant: any) => participant.user_id === auth?.session?.user?.id);
     const joinedDate = challenge?.participants?.find((participant: any) => participant.user_id === auth?.session?.user?.id)?.joined_at || null;
+    const participantsCount = challenge?.participants?.length || 0;
 
     const joinChallengeMutation = useMutation({
         mutationFn: async (challengeId: number) => {
@@ -32,7 +33,6 @@ export default function ChallengeDetail({ challenge }: { challenge: any }) {
         },
         onSuccess: () => {
             toast.success("Successfully joined challenge!");
-            // Invalidate all challenge-related queries
             queryClient.invalidateQueries({ queryKey: ['challenges'] });
             queryClient.invalidateQueries({ queryKey: ['challenge', challenge.id] });
         },
@@ -53,7 +53,6 @@ export default function ChallengeDetail({ challenge }: { challenge: any }) {
         },
         onSuccess: () => {
             toast.success("Successfully left challenge");
-            // Invalidate all challenge-related queries
             queryClient.invalidateQueries({ queryKey: ['challenges'] });
             queryClient.invalidateQueries({ queryKey: ['challenge', challenge.id] });
         },
@@ -65,9 +64,9 @@ export default function ChallengeDetail({ challenge }: { challenge: any }) {
 
     if (!challenge) {
         return (
-            <div className="container mx-auto py-8">
-                <Card>
-                    <CardHeader>
+            <div className="container mx-auto px-4 py-6 sm:py-8">
+                <Card className="hover-lift">
+                    <CardHeader className="space-y-1">
                         <Skeleton className="h-6 w-48" />
                         <Skeleton className="h-4 w-32" />
                     </CardHeader>
@@ -80,23 +79,36 @@ export default function ChallengeDetail({ challenge }: { challenge: any }) {
     }
 
     return (
-        <div className="container mx-auto py-8">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div className="container mx-auto px-4 py-6 sm:py-8">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
                 {/* Left Column */}
-                <div className="space-y-8">
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>{challenge.title}</CardTitle>
-                            <CardDescription>{challenge.duration} days</CardDescription>
+                <div className="space-y-6 lg:space-y-8">
+                    <Card className="hover-lift">
+                        <CardHeader className="space-y-1">
+                            <div className="flex items-start justify-between">
+                                <div>
+                                    <CardTitle className="text-2xl">{challenge.title}</CardTitle>
+                                    <CardDescription className="text-sm capitalize flex justify-start items-center gap-2 divide-x divide-slate-400">
+                                        <div className="flex items-center gap-2 text-muted-foreground">
+                                            <Calendar1 className="h-4 w-4" />
+                                            <span>{challenge.duration} days</span>
+                                        </div>
+                                        <div className="pl-2 flex items-center gap-2 text-muted-foreground">
+                                            <Users className="h-4 w-4" />
+                                            <span>{participantsCount} participants</span>
+                                        </div>
+                                    </CardDescription>
+                                </div>
+                            </div>
                         </CardHeader>
-                        <CardContent>
-                            <p className="mb-4">{challenge.description}</p>
+                        <CardContent className="space-y-4">
+                            <p className="text-sm text-muted-foreground">{challenge.description}</p>
                             {!!auth.session ? (
                                 alreadyJoined ? (
-                                    <div className="flex justify-center items-center gap-2">
+                                    <div className="flex flex-col sm:flex-row gap-3 pt-2">
                                         <Button
                                             onClick={() => leaveChallengeMutation.mutate(challenge.id)}
-                                            className="mt-4"
+                                            className="w-full sm:w-auto"
                                             variant="destructive"
                                             disabled={leaveChallengeMutation.isPending}
                                         >
@@ -111,22 +123,27 @@ export default function ChallengeDetail({ challenge }: { challenge: any }) {
                                                     toast.error("Failed to share link");
                                                 }
                                             }}
-                                            className="mt-4 inline-flex items-center justify-center gap-2 whitespace-nowrap"
+                                            className="w-full sm:w-auto inline-flex items-center justify-center gap-2"
                                         >
-                                            Challenge Friend <Share2 />
+                                            Challenge Friend <Share2 className="h-4 w-4" />
                                         </Button>
                                     </div>
                                 ) : (
                                     <Button
                                         onClick={() => joinChallengeMutation.mutate(challenge.id)}
-                                        className="mt-4"
+                                        className="w-full sm:w-auto"
                                         disabled={alreadyJoined || joinChallengeMutation.isPending}
                                     >
                                         {joinChallengeMutation.isPending ? "Joining..." : "Join Challenge"}
                                     </Button>
                                 )
                             ) : (
-                                <Link href="/">Login to Join Challenges</Link>
+                                <Link 
+                                    href="/" 
+                                    className="inline-flex items-center justify-center w-full sm:w-auto rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4"
+                                >
+                                    Login to Join Challenges
+                                </Link>
                             )}
                         </CardContent>
                     </Card>
@@ -144,7 +161,7 @@ export default function ChallengeDetail({ challenge }: { challenge: any }) {
                 </div>
 
                 {/* Right Column - Leaderboard */}
-                <div className="">
+                <div className="lg:sticky lg:top-6 lg:self-start">
                     <Leaderboard challengeId={challenge.id} />
                 </div>
             </div>

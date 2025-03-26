@@ -57,15 +57,24 @@ export default function ChallengeList() {
   const challenges = challengesQuery.data || [];
 
   return (
-    <div className="space-y-4">
-      <h2 className="text-2xl font-bold">Active Challenges</h2>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-x-2">
+    <div className="space-y-6 px-4 sm:px-6">
+      <div className="flex items-center justify-between">
+        <h2 className="text-2xl font-bold tracking-tight">Active Challenges</h2>
+        <Button 
+          className="hidden sm:flex items-center gap-2"
+          onClick={() => {/* Add create challenge handler */}}
+        >
+          Create Challenge
+        </Button>
+      </div>
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
         {challengesQuery.isLoading ? (
           // Loading skeletons
           Array.from({ length: 3 }).map((_, i) => (
-            <Card key={i} className="flex flex-col justify-between">
+            <Card key={i} className="flex flex-col justify-between hover-lift">
               <div>
-                <CardHeader>
+                <CardHeader className="space-y-1">
                   <Skeleton className="h-6 w-3/4" />
                   <Skeleton className="h-4 w-1/4" />
                 </CardHeader>
@@ -80,12 +89,20 @@ export default function ChallengeList() {
             </Card>
           ))
         ) : challengesQuery.isError ? (
-          <div className="col-span-full text-center text-muted-foreground">
-            Error loading challenges. Please try again.
+          <div className="col-span-full text-center text-muted-foreground p-8">
+            <p className="text-lg font-medium">Error loading challenges</p>
+            <p className="text-sm mt-2">Please try again later</p>
           </div>
         ) : challenges.length === 0 ? (
-          <div className="col-span-full text-center text-muted-foreground">
-            No active challenges. Create one to get started!
+          <div className="col-span-full text-center text-muted-foreground p-8">
+            <p className="text-lg font-medium">No active challenges</p>
+            <p className="text-sm mt-2">Create one to get started!</p>
+            <Button 
+              className="mt-4"
+              onClick={() => {/* Add create challenge handler */}}
+            >
+              Create Challenge
+            </Button>
           </div>
         ) : (
           challenges.map((challenge: Challenge) => {
@@ -93,25 +110,28 @@ export default function ChallengeList() {
             const alreadyJoined = challenge.participants.some(p => p.user_id === user?.id);
             
             return (
-              <Card key={challenge.id} className="flex flex-col justify-between">
+              <Card key={challenge.id} className="flex flex-col justify-between hover-lift">
                 <div>
-                  <CardHeader>
-                    <CardTitle>{challenge.title}</CardTitle>
-                    <CardDescription>{challenge.duration} days</CardDescription>
+                  <CardHeader className="space-y-1">
+                    <CardTitle className="text-xl">{challenge.title}</CardTitle>
+                    <CardDescription className="text-sm">{challenge.duration} days</CardDescription>
                   </CardHeader>
-                  <CardContent>
-                    <p className="text-justify">{challenge.description}</p>
+                  <CardContent className="space-y-4">
+                    <p className="text-sm text-muted-foreground line-clamp-3">{challenge.description}</p>
                     {participantsCount > 0 && (
-                      <p className="text-left text-sm">Participants: {participantsCount}</p>
+                      <div className="flex items-center gap-2 text-sm">
+                        <span className="font-medium">{participantsCount}</span>
+                        <span className="text-muted-foreground">participants</span>
+                      </div>
                     )}
                   </CardContent>
                 </div>
-                <CardFooter className="flex justify-between items-center gap-2 flex-wrap">
+                <CardFooter className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-3 pt-4">
                   {user?.id !== challenge.created_by ? (
                     alreadyJoined ? (
                       <Button
                         onClick={() => leaveChallengeMutation.mutate(challenge.id)}
-                        className="mt-4"
+                        className="w-full sm:w-auto"
                         variant="destructive"
                         disabled={leaveChallengeMutation.isPending}
                       >
@@ -120,7 +140,7 @@ export default function ChallengeList() {
                     ) : (
                       <Button
                         onClick={() => joinChallengeMutation.mutate(challenge.id)}
-                        className="mt-4"
+                        className="w-full sm:w-auto"
                         disabled={alreadyJoined || joinChallengeMutation.isPending}
                       >
                         {joinChallengeMutation.isPending ? "Joining..." : "Join Challenge"}
@@ -135,13 +155,16 @@ export default function ChallengeList() {
                           toast.error("Failed to share link");
                         }
                       }}
-                      className="mt-4 inline-flex items-center justify-center gap-2 whitespace-nowrap"
+                      className="w-full sm:w-auto inline-flex items-center justify-center gap-2"
                     >
-                      Challenge Friend <Share2 />
+                      Challenge Friend <Share2 className="h-4 w-4" />
                     </Button>
                   )}
-                  <Link href={`/challenges/join/${challenge.id}`} className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4 py-2 mt-4">
-                    Visit Challenge <SquareArrowOutUpRight />
+                  <Link 
+                    href={`/challenges/join/${challenge.id}`} 
+                    className="w-full sm:w-auto inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-input bg-background hover:bg-accent hover:text-accent-foreground h-10 px-4"
+                  >
+                    Visit Challenge <SquareArrowOutUpRight className="h-4 w-4" />
                   </Link>
                 </CardFooter>
               </Card>
