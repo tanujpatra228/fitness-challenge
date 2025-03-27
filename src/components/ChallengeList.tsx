@@ -57,14 +57,13 @@ export default function ChallengeList() {
   const challenges = challengesQuery.data || [];
 
   return (
-    <div className="space-y-6 px-4 sm:px-6">
+    <div className="space-y-6 px-4 sm:px-6 py-4">
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-bold tracking-tight">Active Challenges</h2>
-        <Button 
-          className="hidden sm:flex items-center gap-2"
-          onClick={() => {/* Add create challenge handler */}}
-        >
-          Create Challenge
+        <Button asChild className="hidden sm:flex items-center gap-2">
+          <Link href="/challenges/add">
+            Create Challenge
+          </Link>
         </Button>
       </div>
 

@@ -75,3 +75,18 @@ export async function leaveChallenge(userId: string, challengeId: number): Promi
   return true;
 }
 
+export async function createChallenge(challenge: Omit<Challenge, 'id' | 'participants'>): Promise<Challenge> {
+  const { data, error } = await supabase
+    .from("challenges")
+    .insert([challenge])
+    .select("id")
+    .single();
+
+  if (error) {
+    console.error("Error creating challenge:", error);
+    throw error;
+  }
+
+  return data as Challenge;
+}
+

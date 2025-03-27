@@ -1,31 +1,43 @@
-import { getProfile } from "@/src/services/profile.services";
+import { getProfile, Profile } from "@/src/services/profile.services";
 import { supabase } from "@/src/utils/supabase";
 import { Session } from "@supabase/supabase-js";
-import { useQuery } from "@tanstack/react-query";
 import React, { createContext, useContext, useEffect, useState } from "react";
 import ProfileDetailsModal from "./ProfileDetailsModal";
 
+type SessionWithProfile = Session & {
+    profile: Profile | null;
+}
+
 interface AuthContextType {
-    session: Session | null;
+    session: SessionWithProfile | null;
     isSignedIn: boolean;
     isLoading: boolean;
+    signOut: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    const [session, setSession] = useState<Session | null>(null);
+    const [session, setSession] = useState<SessionWithProfile | null>(null);
     const [showProfileModal, setShowProfileModal] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
+
+    const signOut = async () => {
+        try {
+            await supabase.auth.signOut();
+        } catch (error) {
+            console.error('Error signing out:', error);
+        }
+    };
 
     // Initial session check
     useEffect(() => {
         const initializeAuth = async () => {
             try {
                 const { data: { session } } = await supabase.auth.getSession();
-                setSession(session);
                 if (session?.user) {
                     const profile = await getProfile(session.user.id);
+                    setSession({...session, profile});
                     if (!profile) {
                         setShowProfileModal(true);
                     }
@@ -43,9 +55,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // Listen for auth changes
     useEffect(() => {
         const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
-            setSession(session);
             if (session?.user) {
                 const profile = await getProfile(session.user.id);
+                setSession({...session, profile});
                 if (!profile) {
                     setShowProfileModal(true);
                 }
@@ -58,7 +70,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }, []);
 
     return (
-        <AuthContext.Provider value={{ session, isSignedIn: !!session, isLoading }}>
+        <AuthContext.Provider value={{ session, isSignedIn: !!session, isLoading, signOut }}>
             {children}
             {session?.user && (
                 <ProfileDetailsModal
