@@ -5,6 +5,7 @@ import { getAvatar } from "@/src/lib/userAvatars";
 
 const LeaderboardAvatar = ({ entry, index }: { entry: LeaderboardEntry, index: number }) => {
     const { session } = useAuth();
+    const isCurrentUser = session?.user?.id === entry.user_id;
     // Function to determine if position gets a podium icon
     const isPodiumPosition = (position: number) => {
         return position <= 2; // Index 0, 1, 2 = 1st, 2nd, 3rd place
@@ -29,7 +30,7 @@ const LeaderboardAvatar = ({ entry, index }: { entry: LeaderboardEntry, index: n
             <Avatar>
                 <AvatarImage
                     className="bg-slate-500"
-                    src={getAvatar(session?.profile || entry.profile)}
+                    src={getAvatar(isCurrentUser ? session?.profile || entry.profile : entry.profile)}
                 />
                 <AvatarFallback className="uppercase">
                     {entry.profile.display_name.charAt(0)}
