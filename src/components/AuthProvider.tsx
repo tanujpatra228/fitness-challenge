@@ -23,8 +23,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const initializeAuth = async () => {
             try {
                 const { data: { session } } = await supabase.auth.getSession();
+                setSession(session);
                 if (session?.user) {
                     const profile = await getProfile(session.user.id);
+                    setSession({...session, profile: (profile && { ...profile, avatar_url: session.user.user_metadata.avatar_url }) || null});
                     if (!profile) {
                         setShowProfileModal(true);
                     }
@@ -47,6 +49,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 return;
             }
             if (session?.user) {
+                setSession(session);
                 const profile = await getProfile(session.user.id);
                 setSession({...session, profile: (profile && { ...profile, avatar_url: session.user.user_metadata.avatar_url }) || null});
                 if (!profile) {
