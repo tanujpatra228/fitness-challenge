@@ -7,11 +7,18 @@ import { LogOut, User } from "lucide-react"
 import Link from "next/link"
 import { Logo } from "@/src/components/ui/logo"
 import { getAvatar } from "../lib/userAvatars"
+import { useRouter } from "next/navigation"
 
 export default function Header() {
   const { session, signOut } = useAuth();
+  const router = useRouter();
   const user = session?.user;
   const profile = session?.profile;
+
+  function handleSignOut() {
+    signOut();
+    router.push("/");
+  }
 
   return (
     <header className="sticky top-0 z-50 w-full px-4 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
@@ -33,7 +40,7 @@ export default function Header() {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={() => signOut()}
+                onClick={handleSignOut}
                 className="gap-2 hover-lift"
               >
                 <LogOut className="h-4 w-4" />
