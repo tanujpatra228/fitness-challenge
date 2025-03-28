@@ -7,7 +7,7 @@ import { Share2, SquareArrowOutUpRight } from "lucide-react"
 import Link from "next/link"
 import { toast } from "sonner"
 import { shareChallengeLink } from "../lib/utils"
-import { fetchChallenges, joinChallenge, leaveChallenge, Challenge } from "../services/challenges.services"
+import { fetchChallenges, joinChallenge, leaveChallenge } from "../services/challenges.services"
 import { useAuth } from "./AuthProvider"
 import { Skeleton } from "./ui/skeleton"
 
@@ -98,9 +98,11 @@ export default function ChallengeList() {
             <p className="text-sm mt-2">Create one to get started!</p>
             <Button 
               className="mt-4"
-              onClick={() => {/* Add create challenge handler */}}
+              asChild
             >
-              Create Challenge
+              <Link href="/challenges/add">
+                Create Challenge
+              </Link>
             </Button>
           </div>
         ) : (

@@ -57,7 +57,7 @@ export default function CreateChallenge() {
       <Card className="w-[450px] mx-auto">
         <CardHeader>
           <CardTitle>Create a New Challenge</CardTitle>
-          <CardDescription>Set up your fitness challenge</CardDescription>
+          <CardDescription>Set up your FitChallenge</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">

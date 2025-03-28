@@ -3,7 +3,7 @@ import './globals.css'
 import Providers from '../components/Providers'
 
 export const metadata: Metadata = {
-  title: 'Fitness Challenge',
+  title: 'FitChallenge',
   description: '',
 }
 

@@ -1,39 +1,5 @@
 import { supabase } from "../utils/supabase";
 
-export interface ProgressEntry {
-  id: number;
-  challenge_id: number;
-  user_id: string;
-  date: string;
-  completed: boolean;
-  notes?: string;
-  created_at?: string;
-}
-
-export interface LeaderboardEntry {
-  user_id: string;
-  profile: {
-    display_name: string;
-    avatar_id: string;
-    gender: string;
-  };
-  completed_count: number;
-  total_days: number;
-  streak: number;
-  last_completed_date: string | null;
-}
-
-interface LeaderboardProgressEntry {
-  user_id: string;
-  completed: boolean;
-  created_at: string;
-  profiles: {
-    display_name: string;
-    avatar_id: string;
-    gender: string;
-  };
-}
-
 export async function logProgress(challengeId: number, userId: string, completed: boolean, notes?: string) {
   const { data, error } = await supabase
     .from('progress')

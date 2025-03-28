@@ -1,13 +1,13 @@
 "use client"
 
 import { useAuth } from "@/src/components/AuthProvider"
-import { Button } from "@/src/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/src/components/ui/avatar"
+import { Button } from "@/src/components/ui/button"
+import { Logo } from "@/src/components/ui/logo"
 import { LogOut, User } from "lucide-react"
 import Link from "next/link"
-import { Logo } from "@/src/components/ui/logo"
-import { getAvatar } from "../lib/userAvatars"
 import { useRouter } from "next/navigation"
+import { getAvatar } from "../lib/userAvatars"
 
 export default function Header() {
   const { session, signOut } = useAuth();
@@ -15,8 +15,8 @@ export default function Header() {
   const user = session?.user;
   const profile = session?.profile;
 
-  function handleSignOut() {
-    signOut();
+  async function handleSignOut() {
+    await signOut();
     router.push("/");
   }
 
@@ -30,7 +30,7 @@ export default function Header() {
             <>
               <div className="flex items-center gap-2 text-sm">
                 <Avatar className="h-8 w-8">
-                  <AvatarImage src={profile ? getAvatar(profile?.avatar_id).src : ""} alt={profile?.display_name || ""} />
+                  <AvatarImage src={profile ? getAvatar(profile) : ""} alt={profile?.display_name || ""} />
                   <AvatarFallback>
                     <User className="h-4 w-4" />
                   </AvatarFallback>

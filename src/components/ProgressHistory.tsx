@@ -2,7 +2,7 @@
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/src/components/ui/card"
 import { useAuth } from "@/src/components/AuthProvider"
-import { getProgress, type ProgressEntry } from "@/src/services/progress.services"
+import { getProgress } from "@/src/services/progress.services"
 import { useQuery } from "@tanstack/react-query"
 import { format } from "date-fns"
 import { CalendarX } from "lucide-react"

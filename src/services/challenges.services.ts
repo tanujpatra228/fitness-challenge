@@ -1,17 +1,5 @@
 import { supabase } from "../utils/supabase";
 
-export interface Challenge {
-  id: number;
-  title: string;
-  description: string;
-  duration: number;
-  created_by: string;
-  participants: {
-    user_id: string;
-    joined_at: string;
-  }[];
-}
-
 export async function fetchChallenges(): Promise<Challenge[]> {
   const { data, error } = await supabase
     .from("challenges")

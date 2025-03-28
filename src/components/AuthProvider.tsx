@@ -1,19 +1,7 @@
-import { getProfile, Profile } from "@/src/services/profile.services";
+import { getProfile } from "@/src/services/profile.services";
 import { supabase } from "@/src/utils/supabase";
-import { Session } from "@supabase/supabase-js";
 import React, { createContext, useContext, useEffect, useState } from "react";
 import ProfileDetailsModal from "./ProfileDetailsModal";
-
-type SessionWithProfile = Session & {
-    profile: Profile | null;
-}
-
-interface AuthContextType {
-    session: SessionWithProfile | null;
-    isSignedIn: boolean;
-    isLoading: boolean;
-    signOut: () => Promise<void>;
-}
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
@@ -37,7 +25,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 const { data: { session } } = await supabase.auth.getSession();
                 if (session?.user) {
                     const profile = await getProfile(session.user.id);
-                    setSession({...session, profile});
                     if (!profile) {
                         setShowProfileModal(true);
                     }
@@ -61,7 +48,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             }
             if (session?.user) {
                 const profile = await getProfile(session.user.id);
-                setSession({...session, profile});
+                setSession({...session, profile: (profile && { ...profile, avatar_url: session.user.user_metadata.avatar_url }) || null});
                 if (!profile) {
                     setShowProfileModal(true);
                 }

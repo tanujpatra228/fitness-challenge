@@ -42,11 +42,20 @@ const avatars = [
 ];
 
 /**
+ * Get avatar
+ * @param profile - profile
+ * @returns avatar
+ */
+export const getAvatar = (profile: ProfileWithAvatar) => {
+    return profile?.avatar_url || getAvatarById(profile.avatar_id).src;
+}
+
+/**
  * Get avatar by id
  * @param id - id of the avatar
  * @returns avatar
  */
-const getAvatar = (id: string, size?: number) => {
+export const getAvatarById = (id: string, size?: number) => {
     const avatar = avatars.find((avatar) => avatar.id === id) || avatars[0];
     return {
         ...avatar,
@@ -68,7 +77,7 @@ const shuffleAvatars = (avatars: { id: string, src: string }[]) => {
  * @param gender - gender of the avatar
  * @returns avatar
  */
-const getAvatarList = (gender: 'male' | 'female', size?: number) => {
+export const getAvatarList = (gender: 'male' | 'female', size?: number) => {
     const genderPrefix = gender === 'male' ? 'm' : 'fm';
     const avatarsList = avatars.filter((avatar) => avatar.id.startsWith(genderPrefix));
     return shuffleAvatars(avatarsList.map((avatar) => ({
@@ -76,5 +85,3 @@ const getAvatarList = (gender: 'male' | 'female', size?: number) => {
         src: avatar.src.replace('{{wh}}', `w_${size || 65},h_${size || 65}`)
     })));
 }
-
-export { getAvatar, getAvatarList };

@@ -1,5 +1,4 @@
 "use client"
-import { LeaderboardEntry } from "@/src/services/progress.services";
 import { Avatar, AvatarFallback, AvatarImage } from "./avatar";
 import { getAvatar } from "@/src/lib/userAvatars";
 
@@ -28,7 +27,7 @@ const LeaderboardAvatar = ({ entry, index }: { entry: LeaderboardEntry, index: n
             <Avatar>
                 <AvatarImage
                     className="bg-slate-500"
-                    src={getAvatar(entry.profile.avatar_id).src}
+                    src={getAvatar(entry.profile)}
                 />
                 <AvatarFallback className="uppercase">
                     {entry.profile.display_name.charAt(0)}

@@ -5,7 +5,7 @@ import Header from '@/src/components/Header';
 
 export const metadata: Metadata = {
   title: 'Active Challenges',
-  description: 'Participate in active fitness challenges',
+  description: 'Participate in active FitChallenges',
 }
 
 export default function RootLayout({

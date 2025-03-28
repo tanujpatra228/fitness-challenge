@@ -12,8 +12,8 @@ export async function shareChallengeLink(challengeId: number, cb?: Function) {
   if (navigator.share) {
     try {
       await navigator.share({
-        title: 'Join my Fitness Challenge',
-        text: 'Join my fitness challenge and track your progress together!',
+        title: 'Join my FitChallenge',
+        text: 'Join my FitChallenge and track your progress together!',
         url: link
       });
       if (cb) cb("Share successful");

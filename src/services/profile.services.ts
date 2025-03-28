@@ -1,14 +1,5 @@
 import { supabase } from "../utils/supabase";
 
-export interface Profile {
-  id: string;
-  display_name: string;
-  gender: 'male' | 'female';
-  avatar_id: string;
-  created_at: string;
-  updated_at: string;
-}
-
 export async function getProfile(userId: string): Promise<Profile | null> {
   const { data, error } = await supabase
     .from('profiles')

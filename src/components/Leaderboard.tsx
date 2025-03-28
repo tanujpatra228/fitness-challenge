@@ -1,7 +1,7 @@
 "use client"
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/src/components/ui/card";
-import { getLeaderboard, LeaderboardEntry } from "@/src/services/progress.services";
+import { getLeaderboard } from "@/src/services/progress.services";
 import { useQuery } from "@tanstack/react-query";
 import LeaderboardAvatar from "./ui/leader-board-avatar";
 import { useAuth } from "./AuthProvider";
