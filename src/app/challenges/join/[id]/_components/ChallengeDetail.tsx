@@ -1,21 +1,19 @@
 'use client'
 
 import { useAuth } from "@/src/components/AuthProvider"
-import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
-import { fetchChallengeById, joinChallenge, leaveChallenge } from "@/src/services/challenges.services"
-import { Button } from "@/src/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/src/components/ui/card"
-import { Progress } from "@/src/components/ui/progress"
 import Leaderboard from "@/src/components/Leaderboard"
-import { Skeleton } from "@/src/components/ui/skeleton"
-import { toast } from "sonner"
-import { Share2, Calendar1, Users } from "lucide-react"
-import Header from "@/src/components/Header"
-import { BackButton } from "@/src/components/ui/back-button"
 import ProgressHistory from "@/src/components/ProgressHistory"
 import ProgressLogger from "@/src/components/ProgressLogger"
+import { BackButton } from "@/src/components/ui/back-button"
+import { Button } from "@/src/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/src/components/ui/card"
+import { Skeleton } from "@/src/components/ui/skeleton"
 import { shareChallengeLink } from "@/src/lib/utils"
+import { joinChallenge, leaveChallenge } from "@/src/services/challenges.services"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
+import { Calendar1, Share2, Users } from "lucide-react"
 import Link from "next/link"
+import { toast } from "sonner"
 
 export default function ChallengeDetail({ challenge }: { challenge: any }) {
     const auth = useAuth();
