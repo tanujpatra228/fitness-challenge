@@ -60,7 +60,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                     }
                 });
                 const profile = await getProfile(session.user.id);
-                setSession({...session, profile: (profile && { ...profile, avatar_url: session.user.user_metadata.avatar_url }) || null});
+                setSession((prevSession: SessionWithProfile | null) => {
+                    if (prevSession?.user.id === session.user.id) {
+                        return prevSession;
+                    }
+                    return {
+                        ...session,
+                        user: session.user,
+                        profile: (profile && { ...profile, avatar_url: session.user.user_metadata.avatar_url }) || null
+                    }
+                });
                 if (!profile) {
                     setShowProfileModal(true);
                 }
