@@ -54,7 +54,7 @@ export default function CreateChallenge() {
   return (
     <div className="space-y-4">
       <BackButton />
-      <Card className="w-[450px] mx-auto">
+      <Card className="max-w-[450px] mx-auto">
         <CardHeader>
           <CardTitle>Create a New Challenge</CardTitle>
           <CardDescription>Set up your FitChallenge</CardDescription>
