@@ -20,7 +20,7 @@ export default function AuthCallbackPage() {
       if (session) {
         router.push("/challenges");
       } else {
-        router.push("/login");
+        router.push("/");
       }
     };
 
