@@ -19,11 +19,6 @@ export default function ChallengeList() {
     queryKey: ['challenges'],
     queryFn: fetchChallenges,
     enabled: !!session?.user,
-    refetchInterval: 10000,
-    staleTime: 5000,
-    gcTime: 30000,
-    retry: 2,
-    retryDelay: 1000,
   });
 
   const joinChallengeMutation = useMutation({

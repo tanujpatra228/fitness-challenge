@@ -21,10 +21,6 @@ export default function ProgressHistory({ challengeId, joinedDate, challengeDura
     queryKey: ['progress', challengeId, 'history'],
     queryFn: () => getProgress(challengeId, session?.user?.id || '', joinedDate, challengeDuration),
     enabled: !!session?.user?.id && !!joinedDate && !!challengeDuration,
-    staleTime: 5000,
-    gcTime: 30000,
-    retry: 2,
-    retryDelay: 1000,
   });
 
   if (!session?.user?.id) {

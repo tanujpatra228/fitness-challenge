@@ -18,11 +18,6 @@ export default function Leaderboard({ challengeId }: LeaderboardProps) {
     queryKey: ['leaderboard', challengeId],
     queryFn: () => getLeaderboard(challengeId),
     enabled: !!challengeId && !!session?.user,
-    refetchInterval: 10000,
-    staleTime: 5000, // Consider data fresh for 5 seconds
-    gcTime: 30000, // Keep data in cache for 30 seconds
-    retry: 2, // Retry failed requests twice
-    retryDelay: 1000, // Wait 1 second between retries
   });
 
   const leaderboard = leaderboardQuery.data || [];
