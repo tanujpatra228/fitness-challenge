@@ -21,13 +21,15 @@ import { toast } from "sonner"
 interface ProfileDetailsModalProps {
   isOpen: boolean;
   onClose: () => void;
-  userId: string;
+  session: SessionWithProfile;
 }
 
-export default function ProfileDetailsModal({ isOpen, onClose, userId }: ProfileDetailsModalProps) {
-  const [displayName, setDisplayName] = useState("");
-  const [gender, setGender] = useState<'male' | 'female'>('male');
-  const [selectedAvatarId, setSelectedAvatarId] = useState<string>("");
+export default function ProfileDetailsModal({ isOpen, onClose, session }: ProfileDetailsModalProps) {
+  const { user, profile } = session;
+  const userId = user.id;
+  const [displayName, setDisplayName] = useState(profile.display_name || "");
+  const [gender, setGender] = useState<'male' | 'female'>(profile.gender || 'male');
+  const [selectedAvatarId, setSelectedAvatarId] = useState<string>(profile.avatar_id || "");
 
   const avatars = useMemo(() => getAvatarList(gender, 65), [gender]);
 

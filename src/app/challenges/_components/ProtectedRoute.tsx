@@ -8,6 +8,7 @@ export const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ childr
   const router = useRouter();
 
   useEffect(() => {
+    // Only redirect if we're not loading and there's no session
     if (!isLoading && !session) {
       router.replace('/');
     }

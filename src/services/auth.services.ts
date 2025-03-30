@@ -1,5 +1,12 @@
 import { supabase } from "../utils/supabase";
 
+function getURL() {
+  let url = process?.env?.NEXT_PUBLIC_SITE_URL ?? process?.env?.NEXT_PUBLIC_VERCEL_URL ?? 'http://localhost:3000/'
+  url = url.startsWith('http') ? url : `https://${url}`
+  url = url.endsWith('/') ? `${url}auth/callback` : `${url}/auth/callback`
+  return url
+}
+
 export async function signInWithEmail(email: string, password: string) {
   const { data, error } = await supabase.auth.signInWithPassword({
     email,
@@ -18,7 +25,7 @@ export async function signUpWithEmail(email: string, password: string) {
     email,
     password,
     options: {
-      emailRedirectTo: `${window.location.origin}/auth/callback`,
+      emailRedirectTo: getURL(),
     },
   });
 
@@ -33,7 +40,7 @@ export async function signInWithGoogle() {
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'google',
     options: {
-      redirectTo: `${window.location.origin}/auth/callback`,
+      redirectTo: getURL(),
     },
   });
 
@@ -48,7 +55,7 @@ export async function signInWithMagicLink(email: string) {
   const { data, error } = await supabase.auth.signInWithOtp({
     email,
     options: {
-      emailRedirectTo: `${window.location.origin}/auth/callback`,
+      emailRedirectTo: getURL(),
     },
   });
 

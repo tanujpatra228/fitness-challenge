@@ -12,8 +12,8 @@ export default function AuthCallbackPage() {
       const { data: { session }, error } = await supabase.auth.getSession();
 
       if (error) {
-        console.error("Error during auth callback:", error);
-        router.push("/login");
+        console.log("Error during auth callback:", error);
+        router.push("/");
         return;
       }
 

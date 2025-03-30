@@ -22,17 +22,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     useEffect(() => {
         const initializeAuth = async () => {
             try {
-                const { data: { session } } = await supabase.auth.getSession();
-                setSession(session);
-                if (session?.user) {
-                    const profile = await getProfile(session.user.id);
-                    setSession({...session, profile: (profile && { ...profile, avatar_url: session.user.user_metadata.avatar_url }) || null});
+                const { data: { session: sessionData } } = await supabase.auth.getSession();
+                if (sessionData?.user) {
+                    const profile = await getProfile(sessionData.user.id);
+                    const sessionWithProfile = {
+                        ...sessionData,
+                        profile
+                    };
+                    setSession(sessionWithProfile);
                     if (!profile) {
                         setShowProfileModal(true);
                     }
+                } else {
+                    setSession(null);
                 }
             } catch (error) {
                 console.error('Error initializing auth:', error);
+                setSession(null);
             } finally {
                 setIsLoading(false);
             }
@@ -43,35 +49,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     // Listen for auth changes
     useEffect(() => {
-        const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, session) => {
+        const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, sessionData) => {
             if (_event === "SIGNED_OUT") {
                 setSession(null);
                 return;
             }
-            if (session?.user) {
-                setSession((prevSession: SessionWithProfile | null) => {
-                    if (prevSession?.user.id === session.user.id) {
-                        return prevSession;
+            else if (_event === "SIGNED_IN") {
+                if (sessionData?.user) {
+                    if (sessionData.user.id === session?.user?.id) {
+                        return;
                     }
-                    return {
-                        ...session,
-                        user: session.user,
-                        profile: (profile && { ...profile, avatar_url: session.user.user_metadata.avatar_url }) || null
+                    const profile = await getProfile(sessionData.user.id);
+                    const sessionWithProfile = {
+                        ...sessionData,
+                        profile
+                    };
+                    setSession(sessionWithProfile);
+                    if (!profile) {
+                        setShowProfileModal(true);
                     }
-                });
-                const profile = await getProfile(session.user.id);
-                setSession((prevSession: SessionWithProfile | null) => {
-                    if (prevSession?.user.id === session.user.id) {
-                        return prevSession;
-                    }
-                    return {
-                        ...session,
-                        user: session.user,
-                        profile: (profile && { ...profile, avatar_url: session.user.user_metadata.avatar_url }) || null
-                    }
-                });
-                if (!profile) {
-                    setShowProfileModal(true);
                 }
             }
         });
@@ -82,13 +78,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }, []);
 
     return (
-        <AuthContext.Provider value={{ session, isSignedIn: !!session, isLoading, signOut }}>
+        <AuthContext.Provider value={{ session, isSignedIn: !!session, isLoading, signOut, setShowProfileModal }}>
             {children}
             {session?.user && (
                 <ProfileDetailsModal
                     isOpen={showProfileModal}
                     onClose={() => setShowProfileModal(false)}
-                    userId={session.user.id}
+                    session={session}
                 />
             )}
         </AuthContext.Provider>

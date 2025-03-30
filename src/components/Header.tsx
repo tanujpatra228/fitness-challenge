@@ -10,7 +10,7 @@ import { useRouter } from "next/navigation"
 import { getAvatar } from "../lib/userAvatars"
 
 export default function Header() {
-  const { session, signOut } = useAuth();
+  const { session, signOut, setShowProfileModal } = useAuth();
   const router = useRouter();
   const user = session?.user;
   const profile = session?.profile;
@@ -28,7 +28,7 @@ export default function Header() {
         <div className="flex items-center gap-4">
           {user ? (
             <>
-              <div className="flex items-center gap-2 text-sm">
+              <div className="flex items-center gap-2 text-sm cursor-pointer" onClick={() => setShowProfileModal(true)}>
                 <Avatar className="h-8 w-8">
                   <AvatarImage src={profile ? getAvatar(profile) : ""} alt={profile?.display_name || ""} />
                   <AvatarFallback>
