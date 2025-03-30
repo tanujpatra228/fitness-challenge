@@ -15,7 +15,7 @@ export const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ childr
   }, [session, isLoading, router]);
 
   // Show loading state while checking authentication
-  if (isLoading) {
+  if (isLoading && !session) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen py-2">
         <main className="flex flex-col items-center justify-center w-full flex-1 px-6 md:px-20 text-center">
