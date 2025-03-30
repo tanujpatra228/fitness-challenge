@@ -151,9 +151,10 @@ export default function ChallengeList() {
                     <Button
                       onClick={async () => {
                         try {
-                          await shareChallengeLink(challenge.id, toast.success);
+                          await shareChallengeLink(challenge.id, challenge.title, toast.success);
                         } catch (error) {
-                          toast.error("Failed to share link");
+                          console.error("Error sharing challenge:", error);
+                          // toast.error("Failed to share link");
                         }
                       }}
                       className="w-full sm:w-auto inline-flex items-center justify-center gap-2"
