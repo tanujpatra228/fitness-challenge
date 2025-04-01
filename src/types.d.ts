@@ -19,6 +19,7 @@ type AuthContextType = {
     isLoading: boolean;
     signOut: () => Promise<void>;
     setShowProfileModal: (show: boolean) => void;
+    error: Error | null;
 }
 
 type AuthError = {

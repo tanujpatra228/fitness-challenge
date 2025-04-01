@@ -9,12 +9,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const [session, setSession] = useState<SessionWithProfile | null>(null);
     const [showProfileModal, setShowProfileModal] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState<Error | null>(null);
 
     const signOut = async () => {
         try {
             await supabase.auth.signOut();
+            setSession(null);
         } catch (error) {
             console.error('Error signing out:', error);
+            setError(error as Error);
         }
     };
 
@@ -22,15 +25,31 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     useEffect(() => {
         const initializeAuth = async () => {
             try {
-                const { data: { session: sessionData } } = await supabase.auth.getSession();
+                setError(null);
+                const { data: { session: sessionData }, error: sessionError } = await supabase.auth.getSession();
+                
+                if (sessionError) {
+                    throw sessionError;
+                }
+
                 if (sessionData?.user) {
-                    const profile = await getProfile(sessionData.user.id);
-                    const sessionWithProfile = {
-                        ...sessionData,
-                        profile
-                    };
-                    setSession(sessionWithProfile);
-                    if (!profile) {
+                    try {
+                        const profile = await getProfile(sessionData.user.id);
+                        const sessionWithProfile = {
+                            ...sessionData,
+                            profile: profile || null
+                        };
+                        setSession(sessionWithProfile);
+                        if (!profile) {
+                            setShowProfileModal(true);
+                        }
+                    } catch (profileError) {
+                        console.error('Error fetching profile:', profileError);
+                        // Still set the session even if profile fetch fails
+                        setSession({
+                            ...sessionData,
+                            profile: null
+                        });
                         setShowProfileModal(true);
                     }
                 } else {
@@ -38,6 +57,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 }
             } catch (error) {
                 console.error('Error initializing auth:', error);
+                setError(error as Error);
                 setSession(null);
             } finally {
                 setIsLoading(false);
@@ -50,35 +70,60 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     // Listen for auth changes
     useEffect(() => {
         const { data: { subscription } } = supabase.auth.onAuthStateChange(async (_event, sessionData) => {
-            if (_event === "SIGNED_OUT") {
-                setSession(null);
-                return;
-            }
-            else if (_event === "SIGNED_IN") {
-                if (sessionData?.user) {
+            try {
+                setError(null);
+                if (_event === "SIGNED_OUT") {
+                    setSession(null);
+                    return;
+                }
+                else if (_event === "SIGNED_IN" && sessionData?.user) {
                     if (sessionData.user.id === session?.user?.id) {
                         return;
                     }
-                    const profile = await getProfile(sessionData.user.id);
-                    const sessionWithProfile = {
-                        ...sessionData,
-                        profile
-                    };
-                    setSession(sessionWithProfile);
-                    if (!profile) {
+                    try {
+                        const profile = await getProfile(sessionData.user.id);
+                        const sessionWithProfile = {
+                            ...sessionData,
+                            profile: profile || null
+                        };
+                        setSession(sessionWithProfile);
+                        if (!profile) {
+                            setShowProfileModal(true);
+                        }
+                    } catch (profileError) {
+                        console.error('Error fetching profile on auth change:', profileError);
+                        // Still set the session even if profile fetch fails
+                        setSession({
+                            ...sessionData,
+                            profile: null
+                        });
                         setShowProfileModal(true);
                     }
                 }
+            } catch (error) {
+                console.error('Error handling auth state change:', error);
+                setError(error as Error);
             }
         });
 
         return () => {
             subscription.unsubscribe();
         };
-    }, []);
+    }, [session?.user?.id]);
+
+    if (error) {
+        console.error('Auth Provider Error:', error);
+    }
 
     return (
-        <AuthContext.Provider value={{ session, isSignedIn: !!session, isLoading, signOut, setShowProfileModal }}>
+        <AuthContext.Provider value={{ 
+            session, 
+            isSignedIn: !!session, 
+            isLoading, 
+            signOut, 
+            setShowProfileModal,
+            error 
+        }}>
             {children}
             {session?.user && (
                 <ProfileDetailsModal
