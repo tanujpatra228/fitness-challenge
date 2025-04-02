@@ -21,33 +21,33 @@ export default function ChallengeList() {
     enabled: !!session?.user,
   });
 
-  // const joinChallengeMutation = useMutation({
-  //   mutationFn: async (challengeId: number) => {
-  //     if (!user) return false;
-  //     const success = await joinChallenge(user.id, challengeId);
-  //     if (success) {
-  //       challengesQuery.refetch();
-  //       toast.success("Successfully joined challenge!");
-  //     } else {
-  //       toast.error("Failed to join challenge");
-  //     }
-  //     return success;
-  //   }
-  // });
+  const joinChallengeMutation = useMutation({
+    mutationFn: async (challengeId: number) => {
+      if (!user) return false;
+      const success = await joinChallenge(user.id, challengeId);
+      if (success) {
+        challengesQuery.refetch();
+        toast.success("Successfully joined challenge!");
+      } else {
+        toast.error("Failed to join challenge");
+      }
+      return success;
+    }
+  });
 
-  // const leaveChallengeMutation = useMutation({
-  //   mutationFn: async (challengeId: number) => {
-  //     if (!user) return false;
-  //     const success = await leaveChallenge(user.id, challengeId);
-  //     if (success) {
-  //       challengesQuery.refetch();
-  //       toast.success("Successfully left challenge");
-  //     } else {
-  //       toast.error("Failed to leave challenge");
-  //     }
-  //     return success;
-  //   }
-  // });
+  const leaveChallengeMutation = useMutation({
+    mutationFn: async (challengeId: number) => {
+      if (!user) return false;
+      const success = await leaveChallenge(user.id, challengeId);
+      if (success) {
+        challengesQuery.refetch();
+        toast.success("Successfully left challenge");
+      } else {
+        toast.error("Failed to leave challenge");
+      }
+      return success;
+    }
+  });
 
   const challenges = challengesQuery.data || [];
 
@@ -124,25 +124,24 @@ export default function ChallengeList() {
                 </div>
                 <CardFooter className="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-3 pt-4">
                   {user?.id !== challenge.created_by ? (
-                    // alreadyJoined ? (
-                    //   <Button
-                    //     onClick={() => leaveChallengeMutation.mutate(challenge.id)}
-                    //     className="w-full sm:w-auto"
-                    //     variant="destructive"
-                    //     disabled={leaveChallengeMutation.isPending}
-                    //   >
-                    //     {leaveChallengeMutation.isPending ? "Leaving..." : "Quit Challenge"}
-                    //   </Button>
-                    // ) : (
-                    //   <Button
-                    //     onClick={() => joinChallengeMutation.mutate(challenge.id)}
-                    //     className="w-full sm:w-auto"
-                    //     disabled={alreadyJoined || joinChallengeMutation.isPending}
-                    //   >
-                    //     {joinChallengeMutation.isPending ? "Joining..." : "Join Challenge"}
-                    //   </Button>
-                    // )
-                    <></>
+                    alreadyJoined ? (
+                      <Button
+                        onClick={() => leaveChallengeMutation.mutate(challenge.id)}
+                        className="w-full sm:w-auto"
+                        variant="destructive"
+                        disabled={leaveChallengeMutation.isPending}
+                      >
+                        {leaveChallengeMutation.isPending ? "Leaving..." : "Quit Challenge"}
+                      </Button>
+                    ) : (
+                      <Button
+                        onClick={() => joinChallengeMutation.mutate(challenge.id)}
+                        className="w-full sm:w-auto"
+                        disabled={alreadyJoined || joinChallengeMutation.isPending}
+                      >
+                        {joinChallengeMutation.isPending ? "Joining..." : "Join Challenge"}
+                      </Button>
+                    )
                   ) : (
                     <Button
                       onClick={async () => {
