@@ -27,9 +27,9 @@ interface ProfileDetailsModalProps {
 export default function ProfileDetailsModal({ isOpen, onClose, session }: ProfileDetailsModalProps) {
   const { user, profile } = session;
   const userId = user.id;
-  const [displayName, setDisplayName] = useState(profile.display_name || "");
-  const [gender, setGender] = useState<'male' | 'female'>(profile.gender || 'male');
-  const [selectedAvatarId, setSelectedAvatarId] = useState<string>(profile.avatar_id || "");
+  const [displayName, setDisplayName] = useState(profile?.display_name || "");
+  const [gender, setGender] = useState<'male' | 'female'>(profile?.gender || 'male');
+  const [selectedAvatarId, setSelectedAvatarId] = useState<string>(profile?.avatar_id || "");
 
   const avatars = useMemo(() => getAvatarList(gender, 65), [gender]);
 
