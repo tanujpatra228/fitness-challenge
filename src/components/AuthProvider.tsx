@@ -79,9 +79,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                     return;
                 }
                 else if (_event === "SIGNED_IN" && sessionData?.user) {
-                    if (sessionData.user.id === session?.user?.id) {
-                        return;
-                    }
                     try {
                         const profile = await getProfile(sessionData.user.id);
                         const sessionWithProfile = {
