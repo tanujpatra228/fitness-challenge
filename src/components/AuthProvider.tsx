@@ -26,35 +26,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const initializeAuth = async () => {
             try {
                 console.log("Initializing auth");
-                setError(null);
                 const { data: { session: sessionData }, error: sessionError } = await supabase.auth.getSession();
                 
                 if (sessionError) {
                     throw sessionError;
                 }
 
-                if (sessionData?.user) {
-                    try {
-                        const profile = await getProfile(sessionData.user.id);
-                        const sessionWithProfile = {
-                            ...sessionData,
-                            profile: profile || null
-                        };
-                        setSession(sessionWithProfile);
-                        if (!profile) {
-                            setShowProfileModal(true);
-                        }
-                    } catch (profileError) {
-                        console.log('Error fetching profile:', profileError);
-                        // Still set the session even if profile fetch fails
-                        setSession({
-                            ...sessionData,
-                            profile: null
-                        });
-                        setShowProfileModal(true);
-                    }
-                } else {
+                if (!sessionData?.user) {
                     setSession(null);
+                    return;
+                }
+
+                const profile = await getProfile(sessionData.user.id);
+                const sessionWithProfile = {
+                    ...sessionData,
+                    profile: profile || null
+                };
+                setSession(sessionWithProfile);
+
+                if (!profile) {
+                    setShowProfileModal(true);
                 }
             } catch (error) {
                 console.log('Error initializing auth:', error);
@@ -79,29 +70,22 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                     return;
                 }
                 else if (_event === "SIGNED_IN" && sessionData?.user) {
-                    try {
-                        const profile = await getProfile(sessionData.user.id);
-                        const sessionWithProfile = {
-                            ...sessionData,
-                            profile: profile || null
-                        };
-                        setSession(sessionWithProfile);
-                        if (!profile) {
-                            setShowProfileModal(true);
-                        }
-                    } catch (profileError) {
-                        console.log('Error fetching profile on auth change:', profileError);
-                        // Still set the session even if profile fetch fails
-                        setSession({
-                            ...sessionData,
-                            profile: null
-                        });
+                    const profile = await getProfile(sessionData.user.id);
+                    const sessionWithProfile = {
+                        ...sessionData,
+                        profile: profile || null
+                    };
+                    setSession(sessionWithProfile);
+
+                    if (!profile) {
                         setShowProfileModal(true);
                     }
                 }
             } catch (error) {
                 console.log('Error handling auth state change:', error);
                 setError(error as Error);
+            } finally {
+                setIsLoading(false);
             }
         });
 
