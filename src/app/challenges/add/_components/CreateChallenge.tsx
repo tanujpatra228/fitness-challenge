@@ -34,7 +34,7 @@ export default function CreateChallenge() {
       router.push("/challenges");
     },
     onError: (error) => {
-      console.error("Error creating challenge:", error);
+      console.log("Error creating challenge:", error);
       toast.error("Failed to create challenge. Please try again.");
     }
   });

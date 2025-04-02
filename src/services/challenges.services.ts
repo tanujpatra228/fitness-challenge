@@ -7,7 +7,7 @@ export async function fetchChallenges(): Promise<Challenge[]> {
     .order('created_at', { ascending: false });
 
   if (error) {
-    console.error("Error fetching challenges:", error);
+    console.log("Error fetching challenges:", error);
     throw error;
   }
 
@@ -22,7 +22,7 @@ export async function fetchChallengeById(id: string): Promise<Challenge | null> 
     .single();
 
   if (error) {
-    console.error("Error fetching challenge:", error);
+    console.log("Error fetching challenge:", error);
     return null;
   }
 
@@ -41,7 +41,7 @@ export async function joinChallenge(userId: string, challengeId: number): Promis
     ]);
 
   if (error) {
-    console.error("Error joining challenge:", error);
+    console.log("Error joining challenge:", error);
     return false;
   }
 
@@ -56,7 +56,7 @@ export async function leaveChallenge(userId: string, challengeId: number): Promi
     .eq("challenge_id", challengeId);
 
   if (error) {
-    console.error("Error leaving challenge:", error);
+    console.log("Error leaving challenge:", error);
     return false;
   }
 
@@ -71,7 +71,7 @@ export async function createChallenge(challenge: Omit<Challenge, 'id' | 'partici
     .single();
 
   if (error) {
-    console.error("Error creating challenge:", error);
+    console.log("Error creating challenge:", error);
     throw error;
   }
 

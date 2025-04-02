@@ -11,7 +11,7 @@ export const ProtectedRoute: React.FC<{ children: React.ReactNode }> = ({ childr
 
   useEffect(() => {
     if (error) {
-      console.error('Protected Route Error:', error);
+      console.log('Protected Route Error:', error);
     }
 
     // Only redirect if we're not loading and there's no session

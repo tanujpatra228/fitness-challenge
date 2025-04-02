@@ -42,7 +42,7 @@ export default function ProgressLogger({ challengeId }: ProgressLoggerProps) {
       queryClient.invalidateQueries({ queryKey: ['leaderboard', challengeId] });
     },
     onError: (error) => {
-      console.error("Error logging progress:", error);
+      console.log("Error logging progress:", error);
       toast.error("Failed to log progress. Please try again.");
     }
   });

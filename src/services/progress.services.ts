@@ -16,7 +16,7 @@ export async function logProgress(challengeId: number, userId: string, completed
     .single();
 
   if (error) {
-    console.error('Error logging progress:', error);
+    console.log('Error logging progress:', error);
     throw error;
   }
 
@@ -132,7 +132,7 @@ export async function getTodayProgress(challengeId: number, userId: string) {
     .single();
 
   if (error && error.code !== 'PGRST116') {
-    console.error('Error fetching today\'s progress:', error);
+    console.log('Error fetching today\'s progress:', error);
     throw error;
   }
 
@@ -156,7 +156,7 @@ export async function getLeaderboard(challengeId: number): Promise<LeaderboardEn
     .order('created_at', { ascending: true });
 
   if (error) {
-    console.error('Error fetching leaderboard:', error);
+    console.log('Error fetching leaderboard:', error);
     throw error;
   }
 

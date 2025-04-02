@@ -16,7 +16,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             await supabase.auth.signOut();
             setSession(null);
         } catch (error) {
-            console.error('Error signing out:', error);
+            console.log('Error signing out:', error);
             setError(error as Error);
         }
     };
@@ -45,7 +45,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                             setShowProfileModal(true);
                         }
                     } catch (profileError) {
-                        console.error('Error fetching profile:', profileError);
+                        console.log('Error fetching profile:', profileError);
                         // Still set the session even if profile fetch fails
                         setSession({
                             ...sessionData,
@@ -57,7 +57,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                     setSession(null);
                 }
             } catch (error) {
-                console.error('Error initializing auth:', error);
+                console.log('Error initializing auth:', error);
                 setError(error as Error);
                 setSession(null);
             } finally {
@@ -90,7 +90,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                             setShowProfileModal(true);
                         }
                     } catch (profileError) {
-                        console.error('Error fetching profile on auth change:', profileError);
+                        console.log('Error fetching profile on auth change:', profileError);
                         // Still set the session even if profile fetch fails
                         setSession({
                             ...sessionData,
@@ -100,7 +100,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                     }
                 }
             } catch (error) {
-                console.error('Error handling auth state change:', error);
+                console.log('Error handling auth state change:', error);
                 setError(error as Error);
             }
         });
@@ -111,7 +111,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }, []);
 
     if (error) {
-        console.error('Auth Provider Error:', error);
+        console.log('Auth Provider Error:', error);
     }
 
     return (

@@ -38,7 +38,7 @@ export default function ChallengeDetail({ challenge }: { challenge: any }) {
             queryClient.invalidateQueries({ queryKey: ['challenge', challenge.id] });
         },
         onError: (error) => {
-            console.error("Error joining challenge:", error);
+            console.log("Error joining challenge:", error);
             toast.error("Failed to join challenge. Please try again.");
         }
     });
@@ -58,7 +58,7 @@ export default function ChallengeDetail({ challenge }: { challenge: any }) {
             queryClient.invalidateQueries({ queryKey: ['challenge', challenge.id] });
         },
         onError: (error) => {
-            console.error("Error leaving challenge:", error);
+            console.log("Error leaving challenge:", error);
             toast.error("Failed to leave challenge. Please try again.");
         }
     });
@@ -124,7 +124,7 @@ export default function ChallengeDetail({ challenge }: { challenge: any }) {
                                                     try {
                                                         await shareChallengeLink(challenge.id, challenge.title, toast.success);
                                                     } catch (error) {
-                                                        console.error("Error sharing challenge:", error);
+                                                        console.log("Error sharing challenge:", error);
                                                         // toast.error("Failed to share link");
                                                     }
                                                 }}

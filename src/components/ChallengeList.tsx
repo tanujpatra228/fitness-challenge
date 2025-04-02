@@ -148,7 +148,7 @@ export default function ChallengeList() {
                         try {
                           await shareChallengeLink(challenge.id, challenge.title, toast.success);
                         } catch (error) {
-                          console.error("Error sharing challenge:", error);
+                          console.log("Error sharing challenge:", error);
                           // toast.error("Failed to share link");
                         }
                       }}
