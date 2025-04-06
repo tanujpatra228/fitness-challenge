@@ -7,8 +7,8 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const [session, setSession] = useState<SessionWithProfile | null>(null);
-    const [showProfileModal, setShowProfileModal] = useState(false);
-    const [isLoading, setIsLoading] = useState(true);
+    const [showProfileModal, setShowProfileModal] = useState<boolean>(false);
+    const [isLoading, setIsLoading] = useState<boolean>(true);
     const [error, setError] = useState<Error | null>(null);
 
     const signOut = async () => {
@@ -65,21 +65,54 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             try {
                 console.log("Auth state changed:", _event);
                 setError(null);
-                if (_event === "SIGNED_OUT") {
-                    setSession(null);
-                    return;
-                }
-                else if (_event === "SIGNED_IN" && sessionData?.user) {
-                    const profile = await getProfile(sessionData.user.id);
-                    const sessionWithProfile = {
-                        ...sessionData,
-                        profile: profile || null
-                    };
-                    setSession(sessionWithProfile);
 
-                    if (!profile) {
-                        setShowProfileModal(true);
-                    }
+                switch (_event) {
+                    case "INITIAL_SESSION":
+                    case "SIGNED_IN":
+                        if (sessionData?.user) {
+                            const profile = await getProfile(sessionData.user.id);
+                            const sessionWithProfile = {
+                                ...sessionData,
+                                profile: profile || null
+                            };
+                            setSession(sessionWithProfile);
+                            if (!profile) {
+                                setShowProfileModal(true);
+                            }
+                        } else {
+                            setSession(null);
+                        }
+                        break;
+
+                    case "SIGNED_OUT":
+                        setSession(null);
+                        break;
+
+                    case "TOKEN_REFRESHED":
+                        if (sessionData?.user) {
+                            const profile = await getProfile(sessionData.user.id);
+                            const sessionWithProfile = {
+                                ...sessionData,
+                                profile: profile || null
+                            };
+                            setSession(sessionWithProfile);
+                        }
+                        break;
+
+                    case "USER_UPDATED":
+                        if (sessionData?.user) {
+                            const profile = await getProfile(sessionData.user.id);
+                            const sessionWithProfile = {
+                                ...sessionData,
+                                profile: profile || null
+                            };
+                            setSession(sessionWithProfile);
+                        }
+                        break;
+
+                    default:
+                        console.log("Unhandled auth event:", _event);
+                        break;
                 }
             } catch (error) {
                 console.log('Error handling auth state change:', error);

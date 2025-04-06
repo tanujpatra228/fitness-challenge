@@ -17,7 +17,7 @@ export default function Header() {
 
   async function handleSignOut() {
     await signOut();
-    router.push("/");
+    router.replace("/");
   }
 
   return (
