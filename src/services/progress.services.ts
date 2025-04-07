@@ -68,9 +68,12 @@ export async function getProgress(challengeId: number, userId: string, joinedDat
 
   // Generate all dates between start_date and start_date + duration
   const startDate = new Date(joinedDate);
+  startDate.setHours(0, 0, 0, 0);
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
   const allDates: ProgressEntry[] = [];
   // find how many days have passed till date from joinedDate but dont count today
-  const daysPassed = Math.ceil((new Date().getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
+  const daysPassed = Math.ceil((today.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24));
 
   // Collect all missing dates
   const missingDates: string[] = [];

@@ -68,6 +68,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
                 switch (_event) {
                     case "INITIAL_SESSION":
+                    case "TOKEN_REFRESHED":
                     case "SIGNED_IN":
                         if (sessionData?.user) {
                             const profile = await getProfile(sessionData.user.id);
@@ -114,6 +115,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                         console.log("Unhandled auth event:", _event);
                         break;
                 }
+                setIsLoading(false);
             } catch (error) {
                 console.log('Error handling auth state change:', error);
                 setError(error as Error);
