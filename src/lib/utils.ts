@@ -11,14 +11,17 @@ export async function shareChallengeLink(challengeId: number, challengeTitle: st
   // Check if Web Share API is available
   if (navigator.share) {
     try {
-      const imageUrl = "https://res.cloudinary.com/dopcbgrcs/image/upload/c_fill,w_1200,h_630/v1743333597/fitchallenger-app_futccf.jpg";
-      const response = await fetch(imageUrl);
-      const blob = await response.blob();
+      // const imageUrl = "https://res.cloudinary.com/dopcbgrcs/image/upload/c_fill,w_1200,h_630/v1743333597/fitchallenger-app_futccf.jpg";
+      // const response = await fetch(imageUrl);
+      // const blob = await response.blob();
+      // await navigator.share({
+      //   title: `I challenge you to do ${challengeTitle} on FitChallenger`,
+      //   text: 'Join my FitChallenge and track your progress together!',
+      //   url: link,
+      //   files: [new File([blob], 'image.jpg', { type: 'image/jpeg' })]
+      // });
       await navigator.share({
-        title: `I challenge you to do ${challengeTitle} on FitChallenger`,
-        text: 'Join my FitChallenge and track your progress together!',
-        url: link,
-        files: [new File([blob], 'image.jpg', { type: 'image/jpeg' })]
+        text: `I challenge you to do ${challengeTitle} on FitChallenger, Join my FitChallenge and track your progress together!\n\n${link}`,
       });
     } catch (error) {
       // If share was cancelled or failed, fallback to clipboard
