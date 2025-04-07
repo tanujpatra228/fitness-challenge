@@ -7,32 +7,22 @@ export function cn(...inputs: ClassValue[]) {
 
 export async function shareChallengeLink(challengeId: number, challengeTitle: string, cb?: Function) {
   const link = `${window.location.origin}/challenges/join/${challengeId}`;
+  const shareMessage = `Alright champ, I’ve just crushed the first round of ${challengeTitle} on FitChallenger — now it’s your turn to step up! 💪\nJoin me in this challenge and let’s see who really owns the grind.\nWe’ll track our progress together, push each other, and yeah… bragging rights are 100% on the table.😏\n\nLet’s go: ${link}`;
   
   // Check if Web Share API is available
   if (navigator.share) {
     try {
-      // const imageUrl = "https://res.cloudinary.com/dopcbgrcs/image/upload/c_fill,w_1200,h_630/v1743333597/fitchallenger-app_futccf.jpg";
-      // const response = await fetch(imageUrl);
-      // const blob = await response.blob();
-      // await navigator.share({
-      //   title: `I challenge you to do ${challengeTitle} on FitChallenger`,
-      //   text: 'Join my FitChallenge and track your progress together!',
-      //   url: link,
-      //   files: [new File([blob], 'image.jpg', { type: 'image/jpeg' })]
-      // });
       await navigator.share({
-        text: `I challenge you to do ${challengeTitle} on FitChallenger, Join my FitChallenge and track your progress together!\n\n${link}`,
+        text: shareMessage,
       });
     } catch (error) {
       // If share was cancelled or failed, fallback to clipboard
-      const clipboardContent = `I challenge you to do ${challengeTitle} on FitChallenger\n\nJoin my FitChallenge and track your progress together!\n\n${link}`;
-      await navigator.clipboard.writeText(clipboardContent);
+      await navigator.clipboard.writeText(shareMessage);
       if (cb) cb("Copy to clipboard");
     }
   } else {
     // Fallback to clipboard if Web Share API is not available
-    const clipboardContent = `I challenge you to do ${challengeTitle} on FitChallenger\n\nJoin my FitChallenge and track your progress together!\n\n${link}`;
-    await navigator.clipboard.writeText(clipboardContent);
+    await navigator.clipboard.writeText(shareMessage);
     if (cb) cb("Copy to clipboard");
   }
 }
