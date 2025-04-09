@@ -53,6 +53,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 setError(error as Error);
                 setSession(null);
             } finally {
+                console.log('finally in initializeAuth: stop loading');
                 setIsLoading(false);
             }
         };
@@ -83,6 +84,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                             if (!profile) {
                                 setShowProfileModal(true);
                             }
+                            console.log('sessionWithProfile', _event, sessionWithProfile);
                         } else {
                             setSession(null);
                         }
@@ -101,6 +103,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 setError(error as Error);
                 setSession(null);
             } finally {
+                console.log('finally in onAuthStateChange: stop loading');
                 setIsLoading(false);
             }
         });
@@ -109,6 +112,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             subscription.unsubscribe();
         };
     }, []);
+
+    useEffect(() => {console.log('isLoading change', isLoading)}, [isLoading]);
 
     if (error) {
         console.log('Auth Provider Error:', error);
