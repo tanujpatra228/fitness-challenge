@@ -34,6 +34,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
                 if (!sessionData?.user) {
                     setSession(null);
+                    setIsLoading(false);
                     return;
                 }
 
@@ -65,11 +66,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
             try {
                 console.log("Auth state changed:", _event);
                 setError(null);
+                setIsLoading(true);
 
                 switch (_event) {
                     case "INITIAL_SESSION":
                     case "TOKEN_REFRESHED":
                     case "SIGNED_IN":
+                    case "USER_UPDATED":
                         if (sessionData?.user) {
                             const profile = await getProfile(sessionData.user.id);
                             const sessionWithProfile = {
@@ -89,36 +92,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
                         setSession(null);
                         break;
 
-                    case "TOKEN_REFRESHED":
-                        if (sessionData?.user) {
-                            const profile = await getProfile(sessionData.user.id);
-                            const sessionWithProfile = {
-                                ...sessionData,
-                                profile: profile || null
-                            };
-                            setSession(sessionWithProfile);
-                        }
-                        break;
-
-                    case "USER_UPDATED":
-                        if (sessionData?.user) {
-                            const profile = await getProfile(sessionData.user.id);
-                            const sessionWithProfile = {
-                                ...sessionData,
-                                profile: profile || null
-                            };
-                            setSession(sessionWithProfile);
-                        }
-                        break;
-
                     default:
                         console.log("Unhandled auth event:", _event);
                         break;
                 }
-                setIsLoading(false);
             } catch (error) {
                 console.log('Error handling auth state change:', error);
                 setError(error as Error);
+                setSession(null);
             } finally {
                 setIsLoading(false);
             }
